@@ -20,8 +20,10 @@ module.exports = function() {
   }
 };
 
-function processRecords(records) {
-  const today = new Date();
+function processRecords(records, today = null) {
+  if (!today) {
+    today = new Date();
+  }
   today.setHours(0, 0, 0, 0);
 
   // Extract unique section names in order of first appearance
@@ -105,21 +107,32 @@ function processRecords(records) {
         : 0;
       const duration = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
 
+      const startPercent = Math.max(0, Math.min(100, (startOffset / projectSpan) * 100));
+      const rawWidth = (duration / projectSpan) * 100;
+      const widthPercent = Math.max(1, Math.min(rawWidth, 100 - startPercent));
+
       task.timeline = {
-        startPercent: Math.max(0, (startOffset / projectSpan) * 100),
-        widthPercent: Math.min(100 - (startOffset / projectSpan) * 100, (duration / projectSpan) * 100)
+        startPercent,
+        widthPercent
       };
     } else {
       task.timeline = null;
     }
   });
 
-  // Sort for timeline view (by start date, then due date)
+  // Sort for timeline view (by section order, then by start date)
   const timelineTasks = [...tasks]
-    .filter(t => t.startDate || t.dueDate)
     .sort((a, b) => {
+      // First sort by section order
+      if (a.sectionOrder !== b.sectionOrder) {
+        return a.sectionOrder - b.sectionOrder;
+      }
+      // Then sort by start date (tasks with dates first, then by date)
       const aDate = a.startDate || a.dueDate;
       const bDate = b.startDate || b.dueDate;
+      if (!aDate && !bDate) return 0;
+      if (!aDate) return 1; // Tasks without dates go last within section
+      if (!bDate) return -1;
       return new Date(aDate) - new Date(bDate);
     });
 
@@ -219,3 +232,10 @@ function calculateStats(tasks, sections, sectionNames) {
     bySection
   };
 }
+
+// Export helper functions for testing
+module.exports.isDoneSection = isDoneSection;
+module.exports.isOverdue = isOverdue;
+module.exports.priorityOrder = priorityOrder;
+module.exports.processRecords = processRecords;
+module.exports.calculateStats = calculateStats;

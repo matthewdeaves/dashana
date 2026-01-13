@@ -20,13 +20,13 @@
     <div class="version-info">
       {% if version %}
         <span class="version-badge">{{ version }}</span>
-        <a href="/" class="version-link">View Latest</a>
+        <a href="{{ config.siteBase }}/" class="version-link">View Latest</a>
       {% else %}
         <span class="version-badge current">Latest</span>
       {% endif %}
 
       {% if versions.length > 0 %}
-        <a href="/versions/" class="version-link">All Versions</a>
+        <a href="{{ config.siteBase }}/versions/" class="version-link">All Versions</a>
       {% endif %}
     </div>
   </div>

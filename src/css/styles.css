@@ -826,6 +826,7 @@ html.dark .theme-icon-light {
 
 /* Column widths */
 .timeline-table .col-name { min-width: 180px; }
+.timeline-table .col-section { width: 100px; }
 .timeline-table .col-start { width: 100px; }
 .timeline-table .col-due { width: 100px; }
 .timeline-table .col-bar { width: 300px; min-width: 200px; }

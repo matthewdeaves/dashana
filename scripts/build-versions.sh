@@ -27,12 +27,28 @@ cp -r _site _site_latest
 # Store versions list for navigation
 VERSIONS_JSON="["
 
+# Extract date from various tag formats
+# Supports: v2026-01-15, 2026-01-15, release-2026-01-15, 2026.01.15, v2026.01.15
+extract_date() {
+  local tag="$1"
+  # Try to extract YYYY-MM-DD or YYYY.MM.DD pattern
+  local date=$(echo "$tag" | grep -oE '[0-9]{4}[-\.][0-9]{2}[-\.][0-9]{2}' | head -1)
+  # Normalize dots to dashes
+  echo "$date" | tr '.' '-'
+}
+
 # Build each tagged version
 for TAG in $TAGS; do
-  # Extract date from tag (expects format: vYYYY-MM-DD or YYYY-MM-DD)
-  DATE=$(echo "$TAG" | sed 's/^v//')
+  # Extract date from tag
+  DATE=$(extract_date "$TAG")
 
-  echo "Building version: $DATE"
+  # Skip tags that don't contain a valid date
+  if [ -z "$DATE" ]; then
+    echo "Skipping tag '$TAG' - no date pattern found"
+    continue
+  fi
+
+  echo "Building version: $DATE (from tag: $TAG)"
 
   # Checkout the tagged version
   git checkout "$TAG" -- data/project.csv 2>/dev/null || continue

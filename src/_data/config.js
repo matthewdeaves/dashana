@@ -5,7 +5,8 @@ module.exports = function() {
   const configPath = path.join(__dirname, '../../dashana.config');
   const config = {
     projectName: 'Project Report',
-    customerName: 'Customer'
+    customerName: 'Customer',
+    siteBase: ''  // Base path for subdirectory deployment (e.g., '/dashana')
   };
 
   try {
@@ -15,6 +16,7 @@ module.exports = function() {
       if (key && value) {
         if (key.trim() === 'PROJECT_NAME') config.projectName = value.trim();
         if (key.trim() === 'CUSTOMER_NAME') config.customerName = value.trim();
+        if (key.trim() === 'SITE_BASE') config.siteBase = value.trim();
       }
     });
   } catch (e) {

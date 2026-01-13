@@ -83,16 +83,17 @@
     print-color-adjust: exact;
   }
 
-  /* Board layout for print */
+  /* Board layout for print - flexbox adapts to any column count */
   .board {
-    display: block !important;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .board-column {
-    display: inline-block;
-    vertical-align: top;
-    width: 19%;
-    margin-right: 0.5%;
+    flex: 1 1 150px;
+    min-width: 120px;
+    max-width: 200px;
     page-break-inside: avoid;
     break-inside: avoid;
     max-height: none !important;

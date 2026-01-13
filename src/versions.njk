@@ -12,7 +12,7 @@ permalink: /versions/
 
   <div class="versions-list">
     <div class="version-item current">
-      <a href="/" class="version-link-card">
+      <a href="{{ config.siteBase }}/" class="version-link-card">
         <span class="version-date">Latest</span>
         <span class="version-label">Current Report</span>
       </a>
@@ -20,7 +20,7 @@ permalink: /versions/
 
     {% for ver in versions %}
     <div class="version-item">
-      <a href="/{{ ver }}/" class="version-link-card">
+      <a href="{{ config.siteBase }}/{{ ver }}/" class="version-link-card">
         <span class="version-date">{{ ver }}</span>
         <span class="version-label">Report Snapshot</span>
       </a>

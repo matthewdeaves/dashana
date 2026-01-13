@@ -8,19 +8,20 @@ permalink: /timeline/
   <div class="page-header">
     <h2>Timeline</h2>
     <p class="page-subtitle">
-      {{ tasks.all.length }} tasks
+      {{ tasks.timeline.length }} tasks
       {% if tasks.projectRange.start %}
         ({{ tasks.projectRange.start }} to {{ tasks.projectRange.end }})
       {% endif %}
     </p>
   </div>
 
-  {% if tasks.all.length > 0 %}
+  {% if tasks.timeline.length > 0 %}
   <div class="table-container">
     <table class="timeline-table">
       <thead>
         <tr>
           <th class="col-name">Task</th>
+          <th class="col-section">Section</th>
           <th class="col-start">Start</th>
           <th class="col-due">Due</th>
           <th class="col-bar">Duration</th>
@@ -28,11 +29,14 @@ permalink: /timeline/
         </tr>
       </thead>
       <tbody>
-        {% for task in tasks.all %}
+        {% for task in tasks.timeline %}
         <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %}">
           <td class="col-name">
             <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
             {{ task.name }}
+          </td>
+          <td class="col-section">
+            <span class="section-badge">{{ task.section }}</span>
           </td>
           <td class="col-start">{{ task.startDate if task.startDate else '—' }}</td>
           <td class="col-due {% if task.isOverdue %}overdue{% endif %}">

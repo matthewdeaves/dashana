@@ -2,123 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse/sync');
 
-// Import the processing logic by reading and extracting functions from tasks.js
-// We'll recreate the key functions here for testing
-function isDoneSection(section) {
-  if (!section) return false;
-  const lower = section.toLowerCase();
-  const donePatterns = ['done', 'complete', 'completed', 'finished', 'closed', 'resolved'];
-  return donePatterns.some(pattern => lower.includes(pattern));
-}
-
-function isOverdue(dueDate, section, today) {
-  if (!dueDate) return false;
-  if (isDoneSection(section)) return false;
-  return new Date(dueDate) < today;
-}
-
-function priorityOrder(priority) {
-  const order = { 'High': 1, 'Medium': 2, 'Low': 3 };
-  return order[priority] || 4;
-}
-
-function processRecords(records, today = new Date()) {
-  today.setHours(0, 0, 0, 0);
-
-  const sectionNamesSet = new Set();
-  records.forEach(record => {
-    const section = record['Section/Column'] || 'Uncategorized';
-    sectionNamesSet.add(section);
-  });
-  const sectionNames = Array.from(sectionNamesSet);
-
-  const sectionOrderMap = {};
-  sectionNames.forEach((name, index) => {
-    sectionOrderMap[name] = index + 1;
-  });
-
-  const tasks = records.map(record => {
-    const section = record['Section/Column'] || 'Uncategorized';
-    return {
-      id: record['Task ID'],
-      name: record['Name'],
-      section: section,
-      assignee: record['Assignee'] || 'Unassigned',
-      assigneeEmail: record['Assignee Email'] || '',
-      startDate: record['Start Date'] || null,
-      dueDate: record['Due Date'] || null,
-      priority: record['Priority'] || null,
-      status: record['Status'] || null,
-      notes: record['Notes'] || '',
-      isOverdue: isOverdue(record['Due Date'], section, today),
-      isDone: isDoneSection(section),
-      priorityOrder: priorityOrder(record['Priority']),
-      sectionOrder: sectionOrderMap[section] || 999
-    };
-  });
-
-  const sections = {};
-  sectionNames.forEach(name => {
-    sections[name] = tasks.filter(t => t.section === name);
-  });
-
-  const stats = calculateStats(tasks, sections, sectionNames);
-
-  return { all: tasks, sections, sectionNames, stats };
-}
-
-function calculateStats(tasks, sections, sectionNames) {
-  const total = tasks.length;
-  const done = tasks.filter(t => t.isDone).length;
-  const overdue = tasks.filter(t => t.isOverdue).length;
-
-  const byStatus = {};
-  let noStatusCount = 0;
-  tasks.forEach(t => {
-    if (t.status) {
-      byStatus[t.status] = (byStatus[t.status] || 0) + 1;
-    } else {
-      noStatusCount++;
-    }
-  });
-  if (noStatusCount > 0) {
-    byStatus['No status'] = noStatusCount;
-  }
-
-  const byPriority = {};
-  let noPriorityCount = 0;
-  tasks.forEach(t => {
-    if (t.priority) {
-      byPriority[t.priority] = (byPriority[t.priority] || 0) + 1;
-    } else {
-      noPriorityCount++;
-    }
-  });
-  if (noPriorityCount > 0) {
-    byPriority['No priority'] = noPriorityCount;
-  }
-
-  const byAssignee = {};
-  tasks.forEach(t => {
-    byAssignee[t.assignee] = (byAssignee[t.assignee] || 0) + 1;
-  });
-
-  const bySection = {};
-  sectionNames.forEach(name => {
-    bySection[name] = sections[name].length;
-  });
-
-  return {
-    total,
-    done,
-    overdue,
-    completionPercent: total > 0 ? Math.round((done / total) * 100) : 0,
-    byStatus,
-    byPriority,
-    byAssignee,
-    bySection
-  };
-}
+// Import processing functions from the actual source
+const tasksModule = require('../src/_data/tasks.js');
+const {
+  isDoneSection,
+  isOverdue,
+  priorityOrder,
+  processRecords
+} = tasksModule;
 
 // Load test fixture
 function loadTestData() {

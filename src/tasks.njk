@@ -6,8 +6,11 @@ permalink: /tasks/
 
 <div class="tasks-page">
   <div class="page-header">
-    <h2>Task List</h2>
-    <p class="page-subtitle">{{ tasks.stats.total }} tasks sorted by section and priority</p>
+    <div class="page-header-top">
+      <h2>Task List</h2>
+      <p class="page-subtitle">{{ tasks.stats.total }} tasks sorted by section and priority</p>
+    </div>
+    {% include "components/filter-toggle.njk" %}
   </div>
 
   <div class="table-container">
@@ -15,6 +18,7 @@ permalink: /tasks/
       <thead>
         <tr>
           <th class="col-name">Name</th>
+          <th class="col-completion">Progress</th>
           <th class="col-section">Section</th>
           <th class="col-assignee">Assignee</th>
           <th class="col-due">Due Date</th>
@@ -25,9 +29,13 @@ permalink: /tasks/
       <tbody>
         {% for task in tasks.all %}
         <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %}">
-          <td class="col-name">
-            <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
-            {{ task.name }}
+          <td class="col-name">{{ task.name }}</td>
+          <td class="col-completion">
+            {% if task.isDone %}
+              <span class="completion-label completion-done">Done</span>
+            {% else %}
+              <span class="completion-label completion-open">Open</span>
+            {% endif %}
           </td>
           <td class="col-section">
             <span class="section-badge">{{ task.section }}</span>

@@ -6,13 +6,16 @@ permalink: /timeline/
 
 <div class="timeline-page">
   <div class="page-header">
-    <h2>Timeline</h2>
-    <p class="page-subtitle">
-      {{ tasks.timeline.length }} tasks
-      {% if tasks.projectRange.start %}
-        ({{ tasks.projectRange.start }} to {{ tasks.projectRange.end }})
-      {% endif %}
-    </p>
+    <div class="page-header-top">
+      <h2>Timeline</h2>
+      <p class="page-subtitle">
+        {{ tasks.timeline.length }} tasks
+        {% if tasks.projectRange.start %}
+          ({{ tasks.projectRange.start }} to {{ tasks.projectRange.end }})
+        {% endif %}
+      </p>
+    </div>
+    {% include "components/filter-toggle.njk" %}
   </div>
 
   {% if tasks.timeline.length > 0 %}
@@ -21,6 +24,7 @@ permalink: /timeline/
       <thead>
         <tr>
           <th class="col-name">Task</th>
+          <th class="col-completion">Progress</th>
           <th class="col-section">Section</th>
           <th class="col-start">Start</th>
           <th class="col-due">Due</th>
@@ -31,9 +35,13 @@ permalink: /timeline/
       <tbody>
         {% for task in tasks.timeline %}
         <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %}">
-          <td class="col-name">
-            <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
-            {{ task.name }}
+          <td class="col-name">{{ task.name }}</td>
+          <td class="col-completion">
+            {% if task.isDone %}
+              <span class="completion-label completion-done">Done</span>
+            {% else %}
+              <span class="completion-label completion-open">Open</span>
+            {% endif %}
           </td>
           <td class="col-section">
             <span class="section-badge">{{ task.section }}</span>

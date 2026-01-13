@@ -456,7 +456,16 @@ html.dark .theme-icon-light {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.page-header-top {
+  flex: 1;
 }
 
 .page-header h2 {
@@ -468,6 +477,53 @@ html.dark .theme-icon-light {
 .page-subtitle {
   margin: 0;
   color: var(--color-text-muted);
+}
+
+/* Filter Toggle */
+.filter-toggle {
+  flex-shrink: 0;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: var(--color-accent);
+}
+
+.filter-btn .filter-label-open {
+  display: none;
+}
+
+.filter-btn.show-open-only .filter-label-all {
+  display: none;
+}
+
+.filter-btn.show-open-only .filter-label-open {
+  display: inline;
+}
+
+.filter-btn.show-open-only {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: white;
+}
+
+/* Hide done tasks when filter is active */
+.show-open-only-active .task-card.is-done,
+.show-open-only-active .row-done {
+  display: none;
 }
 
 .board {
@@ -555,45 +611,14 @@ html.dark .theme-icon-light {
 }
 
 .task-card.is-done {
-  opacity: 0.5;
-}
-
-.task-card.is-done .task-name {
-  text-decoration: line-through;
+  border-left: 3px solid var(--color-on-track);
 }
 
 .card-header {
   display: flex;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 0.5rem;
-}
-
-/* Checkbox indicator */
-.task-checkbox {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--color-border);
-  border-radius: 3px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.task-checkbox.checked {
-  background: var(--color-on-track);
-  border-color: var(--color-on-track);
-  position: relative;
-}
-
-.task-checkbox.checked::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 1px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
 }
 
 .task-name {
@@ -601,6 +626,29 @@ html.dark .theme-icon-light {
   font-size: 0.875rem;
   line-height: 1.3;
   flex: 1;
+}
+
+/* Completion Label */
+.completion-label {
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.completion-open {
+  background: var(--color-at-risk-bg);
+  color: var(--color-at-risk);
+  border: 1px solid var(--color-at-risk);
+}
+
+.completion-done {
+  background: var(--color-on-track-bg);
+  color: var(--color-on-track);
+  border: 1px solid var(--color-on-track);
 }
 
 /* Status Dot */
@@ -733,23 +781,14 @@ html.dark .theme-icon-light {
   background: var(--color-off-track-bg) !important;
 }
 
-/* Done row */
+/* Done row - subtle green left border */
 .task-table .row-done {
-  opacity: 0.5;
-}
-
-.task-table .row-done .col-name {
-  text-decoration: line-through;
-}
-
-.task-table .col-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  border-left: 3px solid var(--color-on-track);
 }
 
 /* Column widths */
 .col-name { min-width: 200px; }
+.col-completion { width: 80px; }
 .col-section { width: 100px; }
 .col-assignee { width: 120px; }
 .col-due { width: 100px; }
@@ -878,21 +917,11 @@ html.dark .theme-icon-light {
 }
 
 .timeline-table .row-done {
-  opacity: 0.5;
+  border-left: 3px solid var(--color-on-track);
 }
 
 .timeline-table .row-no-dates {
   opacity: 0.7;
-}
-
-.timeline-table .col-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.timeline-table .row-done .col-name {
-  text-decoration: line-through;
 }
 
 .no-dates-label {

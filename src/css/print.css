@@ -15,7 +15,8 @@
   /* Hide navigation and interactive elements */
   .site-header nav,
   .version-info,
-  .version-link {
+  .version-link,
+  .filter-toggle {
     display: none !important;
   }
 

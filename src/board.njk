@@ -6,8 +6,11 @@ permalink: /board/
 
 <div class="board-page">
   <div class="page-header">
-    <h2>Kanban Board</h2>
-    <p class="page-subtitle">{{ tasks.stats.total }} tasks across {{ tasks.sectionNames | length }} columns</p>
+    <div class="page-header-top">
+      <h2>Kanban Board</h2>
+      <p class="page-subtitle">{{ tasks.stats.total }} tasks across {{ tasks.sectionNames | length }} columns</p>
+    </div>
+    {% include "components/filter-toggle.njk" %}
   </div>
 
   <div class="board">

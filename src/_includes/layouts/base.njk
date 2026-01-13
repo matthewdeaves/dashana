@@ -26,9 +26,9 @@
     {{ content | safe }}
   </main>
   <script>
-    var toggle = document.getElementById('theme-toggle');
-    if (toggle) {
-      toggle.addEventListener('click', function() {
+    var themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', function() {
         var html = document.documentElement;
         var isDark = html.classList.contains('dark');
         html.classList.remove('dark', 'light');
@@ -39,6 +39,22 @@
           html.classList.add('dark');
           localStorage.setItem('theme', 'dark');
         }
+      });
+    }
+
+    var filterToggle = document.getElementById('filter-toggle');
+    if (filterToggle) {
+      // Restore filter state from localStorage
+      var filterState = localStorage.getItem('filterOpenOnly');
+      if (filterState === 'true') {
+        filterToggle.classList.add('show-open-only');
+        document.body.classList.add('show-open-only-active');
+      }
+
+      filterToggle.addEventListener('click', function() {
+        var isFiltered = filterToggle.classList.toggle('show-open-only');
+        document.body.classList.toggle('show-open-only-active', isFiltered);
+        localStorage.setItem('filterOpenOnly', isFiltered);
       });
     }
   </script>

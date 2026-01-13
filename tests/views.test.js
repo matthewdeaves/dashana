@@ -22,10 +22,12 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  // Restore production CSV
+  // Restore production CSV and rebuild site
   if (fs.existsSync(BACKUP_CSV)) {
     fs.copyFileSync(BACKUP_CSV, PRODUCTION_CSV);
     fs.unlinkSync(BACKUP_CSV);
+    // Rebuild with original data so _site/ reflects production
+    execSync('npm run build', { cwd: path.join(__dirname, '..'), stdio: 'pipe' });
   }
 });
 
@@ -169,14 +171,19 @@ describe('Board View', () => {
     expect(cards).toBe(8);
   });
 
-  test('each task has a checkbox', () => {
-    const checkboxes = $('.task-checkbox').length;
-    expect(checkboxes).toBe(8);
+  test('each task has a completion label', () => {
+    const labels = $('.completion-label').length;
+    expect(labels).toBe(8);
   });
 
-  test('done tasks have checked checkbox', () => {
-    const checkedBoxes = $('.task-checkbox.checked').length;
-    expect(checkedBoxes).toBe(3); // 3 tasks in Done/Completed sections
+  test('done tasks have "Done" completion label', () => {
+    const doneLabels = $('.completion-done').length;
+    expect(doneLabels).toBe(3); // 3 tasks in Done/Completed sections
+  });
+
+  test('open tasks have "Open" completion label', () => {
+    const openLabels = $('.completion-open').length;
+    expect(openLabels).toBe(5); // 5 tasks not in Done/Completed sections
   });
 
   test('columns show progress counts', () => {
@@ -228,14 +235,14 @@ describe('Tasks View', () => {
     expect(rows).toBe(8);
   });
 
-  test('each row has a checkbox', () => {
-    const checkboxes = $('.task-table .task-checkbox').length;
-    expect(checkboxes).toBe(8);
+  test('each row has a completion label in its own column', () => {
+    const labels = $('.task-table .col-completion .completion-label').length;
+    expect(labels).toBe(8);
   });
 
-  test('done tasks have checked checkbox', () => {
-    const checkedBoxes = $('.task-table .task-checkbox.checked').length;
-    expect(checkedBoxes).toBe(3);
+  test('done tasks have "Done" completion label', () => {
+    const doneLabels = $('.task-table .col-completion .completion-done').length;
+    expect(doneLabels).toBe(3);
   });
 
   test('done rows have row-done class', () => {
@@ -275,14 +282,14 @@ describe('Timeline View', () => {
     expect(rows).toBe(8);
   });
 
-  test('each row has a checkbox', () => {
-    const checkboxes = $('.timeline-table .task-checkbox').length;
-    expect(checkboxes).toBe(8);
+  test('each row has a completion label in its own column', () => {
+    const labels = $('.timeline-table .col-completion .completion-label').length;
+    expect(labels).toBe(8);
   });
 
-  test('done tasks have checked checkbox', () => {
-    const checkedBoxes = $('.timeline-table .task-checkbox.checked').length;
-    expect(checkedBoxes).toBe(3);
+  test('done tasks have "Done" completion label', () => {
+    const doneLabels = $('.timeline-table .col-completion .completion-done').length;
+    expect(doneLabels).toBe(3);
   });
 
   test('tasks without dates show "No dates" label', () => {

@@ -1,0 +1,23 @@
+{% set columnTasks = tasks.sections[sectionName] %}
+{% set doneTasks = columnTasks | selectattr("isDone") | list %}
+{% set doneCount = doneTasks | length %}
+{% set outstandingCount = columnTasks.length - doneCount %}
+
+<div class="board-column {% if outstandingCount == 0 and columnTasks.length > 0 %}all-done{% endif %}">
+  <div class="column-header">
+    <div class="column-title-row">
+      <h3 class="column-title">{{ sectionName }}</h3>
+      <span class="column-count">{{ columnTasks.length }}</span>
+    </div>
+    {% if columnTasks.length > 0 %}
+      <span class="column-progress {% if outstandingCount == 0 %}complete{% elif outstandingCount > 0 %}has-outstanding{% endif %}">
+        {{ doneCount }}/{{ columnTasks.length }} complete
+      </span>
+    {% endif %}
+  </div>
+  <div class="column-cards">
+    {% for task in columnTasks %}
+      {% include "components/task-card.njk" %}
+    {% endfor %}
+  </div>
+</div>

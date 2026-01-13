@@ -1,0 +1,4 @@
+# Customer-specific files - always keep local version on merge
+# When syncing template updates, these files won't be overwritten
+data/project.csv merge=ours
+dashana.config merge=ours

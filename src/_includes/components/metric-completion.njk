@@ -1,0 +1,10 @@
+<div class="metric-card metric-completion">
+  <h3 class="metric-title">Completion</h3>
+  <div class="completion-display">
+    <span class="completion-percent">{{ tasks.stats.completionPercent }}%</span>
+    <span class="completion-detail">{{ tasks.stats.done }} of {{ tasks.stats.total }} done</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" style="width: {{ tasks.stats.completionPercent }}%"></div>
+  </div>
+</div>

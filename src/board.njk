@@ -1,0 +1,18 @@
+---
+layout: layouts/base.njk
+title: Board
+permalink: /board/
+---
+
+<div class="board-page">
+  <div class="page-header">
+    <h2>Kanban Board</h2>
+    <p class="page-subtitle">{{ tasks.stats.total }} tasks across {{ tasks.sectionNames | length }} columns</p>
+  </div>
+
+  <div class="board">
+    {% for sectionName in tasks.sectionNames %}
+      {% include "components/board-column.njk" %}
+    {% endfor %}
+  </div>
+</div>

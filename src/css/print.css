@@ -1,0 +1,140 @@
+/* Print Stylesheet */
+@media print {
+  /* Reset to light colors for printing */
+  :root {
+    --color-bg: #ffffff !important;
+    --color-bg-alt: #f8f9fa !important;
+    --color-text: #000000 !important;
+    --color-text-muted: #333333 !important;
+    --color-border: #cccccc !important;
+    --color-on-track-bg: #e8f5e9 !important;
+    --color-at-risk-bg: #fff8e1 !important;
+    --color-off-track-bg: #ffebee !important;
+  }
+
+  /* Hide navigation and interactive elements */
+  .site-header nav,
+  .version-info,
+  .version-link {
+    display: none !important;
+  }
+
+  /* Simplify header */
+  .site-header {
+    background: none !important;
+    border-bottom: 2px solid #000;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+  }
+
+  /* Ensure content uses full width */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  .dashboard,
+  .board-page,
+  .tasks-page,
+  .timeline-page,
+  .versions-page {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Remove shadows and simplify cards */
+  .metric-card,
+  .task-card,
+  .version-link-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Improve table printing */
+  .task-table,
+  .timeline-table {
+    font-size: 10pt;
+  }
+
+  .task-table th,
+  .timeline-table th {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .task-table tbody tr:nth-child(even),
+  .timeline-table tbody tr:nth-child(even) {
+    background: #f9f9f9 !important;
+  }
+
+  /* Ensure badges print with color */
+  .status-badge,
+  .priority-badge,
+  .section-badge,
+  .version-badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Board layout for print */
+  .board {
+    display: block !important;
+  }
+
+  .board-column {
+    display: inline-block;
+    vertical-align: top;
+    width: 19%;
+    margin-right: 0.5%;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Progress bar printing */
+  .progress-bar,
+  .progress-fill,
+  .priority-bar,
+  .priority-fill,
+  .timeline-bar-container,
+  .timeline-bar {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Links don't need underlines in print */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+  }
+
+  /* Hide elements that don't make sense in print */
+  .empty-state {
+    display: none !important;
+  }
+
+  /* Metrics grid for print */
+  .metrics-grid {
+    display: block !important;
+  }
+
+  .metric-card {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+    margin: 0.5% 0.5% 1% 0.5%;
+  }
+}

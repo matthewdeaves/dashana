@@ -1,0 +1,7 @@
+<div class="metric-card metric-overdue {% if tasks.stats.overdue > 0 %}has-overdue{% endif %}">
+  <h3 class="metric-title">Overdue</h3>
+  <div class="overdue-display">
+    <span class="overdue-count">{{ tasks.stats.overdue }}</span>
+    <span class="overdue-label">tasks past due</span>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<header class="site-header">
+  <div class="header-top">
+    <h1 class="site-title">{{ config.projectName }}</h1>
+    <span class="customer-name">{{ config.customerName }}</span>
+  </div>
+
+  <nav class="main-nav">
+    <a href="{{ pathPrefix }}/" class="nav-link {% if page.url == '/' or page.url == pathPrefix + '/' %}active{% endif %}">Dashboard</a>
+    <a href="{{ pathPrefix }}/board/" class="nav-link {% if '/board/' in page.url %}active{% endif %}">Board</a>
+    <a href="{{ pathPrefix }}/tasks/" class="nav-link {% if '/tasks/' in page.url %}active{% endif %}">Tasks</a>
+    <a href="{{ pathPrefix }}/timeline/" class="nav-link {% if '/timeline/' in page.url %}active{% endif %}">Timeline</a>
+  </nav>
+
+  <div class="header-actions">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+      <span class="theme-icon-light">Light</span>
+      <span class="theme-icon-dark">Dark</span>
+    </button>
+
+    <div class="version-info">
+      {% if version %}
+        <span class="version-badge">{{ version }}</span>
+        <a href="/" class="version-link">View Latest</a>
+      {% else %}
+        <span class="version-badge current">Latest</span>
+      {% endif %}
+
+      {% if versions.length > 0 %}
+        <a href="/versions/" class="version-link">All Versions</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

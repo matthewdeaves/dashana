@@ -1,0 +1,9 @@
+Task ID,Created At,Completed At,Last Modified,Name,Section/Column,Assignee,Assignee Email,Start Date,Due Date,Tags,Notes,Projects,Parent task,Blocked By (Dependencies),Blocking (Dependencies),Priority,Status
+"1",2026-01-01,,2026-01-01,Task One,To do,Alice,alice@test.com,2026-01-01,2026-01-10,,,Test Project,,,,High,On track
+"2",2026-01-01,,2026-01-01,Task Two,To do,Bob,bob@test.com,2026-01-02,2026-01-05,,,Test Project,,,,Medium,At risk
+"3",2026-01-01,,2026-01-01,Task Three,In Progress,Alice,alice@test.com,2026-01-03,2026-01-08,,,Test Project,,,,Low,On track
+"4",2026-01-01,,2026-01-01,Task Four,In Progress,,,,,,,Test Project,,,,High,Off track
+"5",2026-01-01,,2026-01-01,Task Five,Done,Bob,bob@test.com,2026-01-01,2026-01-03,,,Test Project,,,,,On track
+"6",2026-01-01,,2026-01-01,Task Six,Done,,,,,,,Test Project,,,,,
+"7",2026-01-01,,2026-01-01,Task Seven,To do,,,,,,,Test Project,,,,,
+"8",2026-01-01,,2026-01-01,Task Eight,Completed,Alice,alice@test.com,,,,,Test Project,,,,Medium,

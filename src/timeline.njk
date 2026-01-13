@@ -1,0 +1,67 @@
+---
+layout: layouts/base.njk
+title: Timeline
+permalink: /timeline/
+---
+
+<div class="timeline-page">
+  <div class="page-header">
+    <h2>Timeline</h2>
+    <p class="page-subtitle">
+      {{ tasks.all.length }} tasks
+      {% if tasks.projectRange.start %}
+        ({{ tasks.projectRange.start }} to {{ tasks.projectRange.end }})
+      {% endif %}
+    </p>
+  </div>
+
+  {% if tasks.all.length > 0 %}
+  <div class="table-container">
+    <table class="timeline-table">
+      <thead>
+        <tr>
+          <th class="col-name">Task</th>
+          <th class="col-start">Start</th>
+          <th class="col-due">Due</th>
+          <th class="col-bar">Duration</th>
+          <th class="col-status">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks.all %}
+        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %}">
+          <td class="col-name">
+            <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
+            {{ task.name }}
+          </td>
+          <td class="col-start">{{ task.startDate if task.startDate else '—' }}</td>
+          <td class="col-due {% if task.isOverdue %}overdue{% endif %}">
+            {{ task.dueDate if task.dueDate else '—' }}
+          </td>
+          <td class="col-bar">
+            {% if task.timeline %}
+            <div class="timeline-bar-container">
+              <div class="timeline-bar {% if task.isOverdue %}overdue{% endif %} {% if task.isDone %}done{% endif %}"
+                   style="left: {{ task.timeline.startPercent }}%; width: {{ task.timeline.widthPercent }}%">
+              </div>
+            </div>
+            {% else %}
+            <span class="no-dates-label">No dates</span>
+            {% endif %}
+          </td>
+          <td class="col-status">
+            {% if task.status %}
+              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-state">No tasks found.</p>
+  {% endif %}
+</div>

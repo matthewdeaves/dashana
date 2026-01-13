@@ -1,0 +1,34 @@
+---
+layout: layouts/base.njk
+title: Version History
+permalink: /versions/
+---
+
+<div class="versions-page">
+  <div class="page-header">
+    <h2>Version History</h2>
+    <p class="page-subtitle">Report snapshots over time</p>
+  </div>
+
+  <div class="versions-list">
+    <div class="version-item current">
+      <a href="/" class="version-link-card">
+        <span class="version-date">Latest</span>
+        <span class="version-label">Current Report</span>
+      </a>
+    </div>
+
+    {% for ver in versions %}
+    <div class="version-item">
+      <a href="/{{ ver }}/" class="version-link-card">
+        <span class="version-date">{{ ver }}</span>
+        <span class="version-label">Report Snapshot</span>
+      </a>
+    </div>
+    {% endfor %}
+
+    {% if versions.length == 0 %}
+    <p class="empty-state">No historical versions yet. Push a tag to create a snapshot.</p>
+    {% endif %}
+  </div>
+</div>

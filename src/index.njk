@@ -1,0 +1,20 @@
+---
+layout: layouts/base.njk
+title: Dashboard
+---
+
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h2>Project Overview</h2>
+    <p class="dashboard-subtitle">{{ tasks.stats.total }} total tasks</p>
+  </div>
+
+  <div class="metrics-grid">
+    {% include "components/metric-completion.njk" %}
+    {% include "components/metric-sections.njk" %}
+    {% include "components/metric-status.njk" %}
+    {% include "components/metric-priority.njk" %}
+    {% include "components/metric-overdue.njk" %}
+    {% include "components/metric-assignees.njk" %}
+  </div>
+</div>

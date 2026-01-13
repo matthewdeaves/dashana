@@ -1,0 +1,18 @@
+<div class="metric-card metric-priority">
+  <h3 class="metric-title">Priority</h3>
+  {% if tasks.stats.byPriority | length > 0 %}
+  <ul class="priority-list">
+    {% for priority, count in tasks.stats.byPriority %}
+    <li class="priority-item priority-{{ priority | lower | replace(' ', '-') }}">
+      <span class="priority-name">{{ priority }}</span>
+      <div class="priority-bar">
+        <div class="priority-fill" style="width: {{ (count / tasks.stats.total * 100) | round }}%"></div>
+      </div>
+      <span class="priority-count">{{ count }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="no-data">No priority data</p>
+  {% endif %}
+</div>

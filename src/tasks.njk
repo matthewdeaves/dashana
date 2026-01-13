@@ -1,0 +1,58 @@
+---
+layout: layouts/base.njk
+title: Tasks
+permalink: /tasks/
+---
+
+<div class="tasks-page">
+  <div class="page-header">
+    <h2>Task List</h2>
+    <p class="page-subtitle">{{ tasks.stats.total }} tasks sorted by section and priority</p>
+  </div>
+
+  <div class="table-container">
+    <table class="task-table">
+      <thead>
+        <tr>
+          <th class="col-name">Name</th>
+          <th class="col-section">Section</th>
+          <th class="col-assignee">Assignee</th>
+          <th class="col-due">Due Date</th>
+          <th class="col-priority">Priority</th>
+          <th class="col-status">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks.all %}
+        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %}">
+          <td class="col-name">
+            <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
+            {{ task.name }}
+          </td>
+          <td class="col-section">
+            <span class="section-badge">{{ task.section }}</span>
+          </td>
+          <td class="col-assignee">{{ task.assignee if task.assignee != 'Unassigned' else '—' }}</td>
+          <td class="col-due {% if task.isOverdue %}overdue{% endif %}">
+            {{ task.dueDate if task.dueDate else '—' }}
+          </td>
+          <td class="col-priority">
+            {% if task.priority %}
+              <span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="col-status">
+            {% if task.status %}
+              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

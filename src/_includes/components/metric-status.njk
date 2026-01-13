@@ -1,0 +1,16 @@
+<div class="metric-card metric-status">
+  <h3 class="metric-title">Status</h3>
+  {% if tasks.stats.byStatus | length > 0 %}
+  <ul class="status-list">
+    {% for status, count in tasks.stats.byStatus %}
+    <li class="status-item status-{{ status | lower | replace(' ', '-') }}">
+      <span class="status-indicator"></span>
+      <span class="status-name">{{ status }}</span>
+      <span class="status-count">{{ count }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="no-data">No status data</p>
+  {% endif %}
+</div>

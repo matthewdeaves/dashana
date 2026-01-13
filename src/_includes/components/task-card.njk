@@ -1,0 +1,28 @@
+<div class="task-card {% if task.isDone %}is-done{% endif %} {% if task.isOverdue %}is-overdue{% endif %}">
+  <div class="card-header">
+    <span class="task-checkbox {% if task.isDone %}checked{% endif %}"></span>
+    <span class="task-name">{{ task.name }}</span>
+  </div>
+
+  <div class="card-meta">
+    {% if task.assignee and task.assignee != 'Unassigned' %}
+      <span class="task-assignee">{{ task.assignee }}</span>
+    {% endif %}
+
+    {% if task.dueDate %}
+      <span class="task-due {% if task.isOverdue %}overdue{% endif %}">
+        {{ task.dueDate }}
+      </span>
+    {% endif %}
+
+    {% if task.status %}
+      <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+    {% endif %}
+  </div>
+
+  {% if task.priority and not task.isDone %}
+    <span class="priority-badge priority-{{ task.priority | lower }}">
+      {{ task.priority }}
+    </span>
+  {% endif %}
+</div>

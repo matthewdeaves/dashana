@@ -1,0 +1,21 @@
+﻿Task ID,Created At,Completed At,Last Modified,Name,Section/Column,Assignee,Assignee Email,Start Date,Due Date,Tags,Notes,Projects,Parent task,Blocked By (Dependencies),Blocking (Dependencies),Priority,Status
+"1212777918659209",2026-01-13,,2026-01-13,Draft project brief,To do,Matt Deaves,matt@matthewdeaves.com,2026-01-13,2026-01-15,,,Cross-functional project plan,,,,Low,On track
+"1212777918659211",2026-01-13,,2026-01-13,Schedule kickoff meeting,To do,Matt Deaves,matt@matthewdeaves.com,2026-01-14,2026-01-16,,,Cross-functional project plan,,,,Medium,At risk
+"1212777917850889",2026-01-13,,2026-01-13,Share timeline with teammates,To do,,,2026-01-15,2026-01-19,,,Cross-functional project plan,,,,High,Off track
+"1212777917850925",2026-01-13,,2026-01-13,thing to do one,To do,,,,,,,Cross-functional project plan,,,,,At risk
+"1212777917850927",2026-01-13,,2026-01-13,thing to do 2,To do,,,,,,,Cross-functional project plan,,,,,
+"1212777917850905",2026-01-13,,2026-01-13,Doing things one,Doing,,,,2026-01-28,,,Cross-functional project plan,,,,Medium,On track
+"1212777917850931",2026-01-13,,2026-01-13,doing thing 1,Doing,,,,2026-01-21,,,Cross-functional project plan,,,,,On track
+"1212777917850933",2026-01-13,,2026-01-13,doing thing 2,Doing,,,,2026-01-14,,,Cross-functional project plan,,,,,
+"1212777917850935",2026-01-13,,2026-01-13,doing thing 3,Doing,,,,,,,Cross-functional project plan,,,,,
+"1212777917850937",2026-01-13,,2026-01-13,doing thing 4,Doing,,,,2026-01-29,,,Cross-functional project plan,,,,Medium,On track
+"1212777917850909",2026-01-13,,2026-01-13,testing thing 1,Testing,Matt Deaves,matt@matthewdeaves.com,,,,,Cross-functional project plan,,,,,
+"1212777917850911",2026-01-13,,2026-01-13,testing thing 2,Testing,,,,,,,Cross-functional project plan,,,,,On track
+"1212777917850913",2026-01-13,,2026-01-13,testing thing four,Testing,,,,,,,Cross-functional project plan,,,,High,
+"1212777917850915",2026-01-13,,2026-01-13,testing thing 5,Testing,,,,,,,Cross-functional project plan,,,,,
+"1212777917850939",2026-01-13,,2026-01-13,reviewing thing one,Reviewing,,,,,,,Cross-functional project plan,,,,,
+"1212777917850941",2026-01-13,,2026-01-13,reviewing thing two,Reviewing,Matt Deaves,matt@matthewdeaves.com,,,,,Cross-functional project plan,,,,Medium,
+"1212777917850943",2026-01-13,,2026-01-13,reviewing thing three,Reviewing,,,,,,,Cross-functional project plan,,,,,On track
+"1212777917850917",2026-01-13,,2026-01-13,done thing one,Done,,,,,,,Cross-functional project plan,,,,,
+"1212777917850919",2026-01-13,,2026-01-13,done thing 2,Done,,,,,,,Cross-functional project plan,,,,High,
+"1212777917850921",2026-01-13,,2026-01-13,done thing 3,Done,,,,,,,Cross-functional project plan,,,,,

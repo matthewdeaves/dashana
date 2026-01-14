@@ -30,7 +30,7 @@
         <span class="version-badge">{{ version }}</span>
         <a href="{{ config.siteBase }}/" class="version-link">View Latest</a>
       {% else %}
-        <span class="version-badge current">Latest</span>
+        <span class="version-badge current">{{ buildDate }}</span>
       {% endif %}
 
       {% if versions.length > 0 %}

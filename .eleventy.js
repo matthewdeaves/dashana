@@ -2,6 +2,9 @@ module.exports = function (eleventyConfig) {
   // Get version from environment (set by build script)
   const version = process.env.DASHANA_VERSION || null;
 
+  // Build date for display in header (formatted as YYYY-MM-DD)
+  const buildDate = new Date().toISOString().split("T")[0];
+
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addWatchTarget("dashana.config");
 
@@ -13,8 +16,9 @@ module.exports = function (eleventyConfig) {
     }
   });
 
-  // Add version to global data
+  // Add version and build date to global data
   eleventyConfig.addGlobalData("version", version);
+  eleventyConfig.addGlobalData("buildDate", buildDate);
 
   // Adjust paths if building a version
   if (version) {

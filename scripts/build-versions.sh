@@ -31,14 +31,6 @@ if [ -z "$TAGS" ]; then
   exit 0
 fi
 
-# Build latest (current state)
-echo "Building latest version..."
-npm run build
-cp -r _site _site_latest
-
-# Store versions list for navigation
-VERSIONS_JSON="["
-
 # Extract date from various tag formats
 # Supports: v2026-01-15, 2026-01-15, release-2026-01-15, 2026.01.15, v2026.01.15
 extract_date() {
@@ -48,6 +40,32 @@ extract_date() {
   # Normalize dots to dashes
   echo "$date" | tr '.' '-'
 }
+
+# Collect all valid version dates first (for versions.json)
+VALID_DATES=()
+for TAG in $TAGS; do
+  DATE=$(extract_date "$TAG")
+  if [ -n "$DATE" ]; then
+    VALID_DATES+=("$DATE")
+  fi
+done
+
+# Generate versions.json BEFORE building so it's available during all builds
+VERSIONS_JSON="["
+for i in "${!VALID_DATES[@]}"; do
+  if [ $i -gt 0 ]; then
+    VERSIONS_JSON="$VERSIONS_JSON,"
+  fi
+  VERSIONS_JSON="$VERSIONS_JSON\"${VALID_DATES[$i]}\""
+done
+VERSIONS_JSON="$VERSIONS_JSON]"
+echo "$VERSIONS_JSON" > _site/versions.json
+echo "Generated versions.json with ${#VALID_DATES[@]} versions"
+
+# Build latest (current state) first
+echo "Building latest version..."
+npm run build
+cp -r _site _site_latest
 
 # Build each tagged version
 for TAG in $TAGS; do
@@ -68,28 +86,26 @@ for TAG in $TAGS; do
     continue
   fi
 
+  # Clear _site before building to avoid accumulating previous version directories
+  rm -rf _site
+  mkdir -p _site
+  # Restore versions.json for this build
+  echo "$VERSIONS_JSON" > _site/versions.json
+
   # Build with version prefix
   DASHANA_VERSION="$DATE" npm run build
 
-  # Move to versioned directory
-  mkdir -p "_site/$DATE"
-  cp -r _site/* "_site/$DATE/" 2>/dev/null || true
-
-  # Add to versions list
-  VERSIONS_JSON="$VERSIONS_JSON\"$DATE\","
+  # Move to versioned directory in latest build
+  mkdir -p "_site_latest/$DATE"
+  cp -r _site/* "_site_latest/$DATE/"
 
   # Restore current CSV
   git checkout HEAD -- data/project.csv
 done
 
-# Restore latest build
-rm -rf _site/*
-cp -r _site_latest/* _site/
-rm -rf _site_latest
-
-# Finalize versions JSON
-VERSIONS_JSON="${VERSIONS_JSON%,}]"
-echo "$VERSIONS_JSON" > _site/versions.json
+# Restore latest build as the root
+rm -rf _site
+mv _site_latest _site
 
 echo "Build complete!"
 echo "Versions built: $VERSIONS_JSON"

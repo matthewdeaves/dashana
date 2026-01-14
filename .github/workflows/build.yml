@@ -1,10 +1,14 @@
 name: Build and Deploy
 
 on:
-  # Trigger on tag push (e.g., v2026-01-15)
+  # Trigger on tag push - supports multiple date formats
+  # v2026-01-15, 2026-01-15, release-2026-01-15, 2026.01.15, v2026.01.15
   push:
     tags:
       - 'v*'
+      - '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]'
+      - 'release-*'
 
   # Allow manual trigger from Actions tab
   workflow_dispatch:

@@ -703,6 +703,86 @@ html.dark .theme-icon-light {
   color: var(--color-off-track);
 }
 
+/* Custom Fields in Card */
+.card-custom-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.custom-field {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: baseline;
+}
+
+.custom-field-name {
+  color: var(--color-text-muted);
+}
+
+.card-custom-fields .custom-field-value {
+  padding: 0.125rem 0.375rem;
+  background: var(--color-bg-alt);
+  border-radius: 3px;
+}
+
+/* Tag Badges */
+.tag-badge {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  background: var(--color-border);
+  border-radius: 3px;
+  font-size: 0.625rem;
+  margin: 0.125rem;
+}
+
+.col-tags {
+  min-width: 120px;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Parent Task Reference */
+.col-parent {
+  width: 120px;
+}
+
+.parent-ref {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.card-parent {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  margin-top: 0.375rem;
+}
+
+/* Notes Preview */
+.col-notes {
+  width: 150px;
+  cursor: help;
+}
+
+.notes-preview {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.card-notes-icon {
+  cursor: help;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
 /* Priority Badge */
 .priority-badge {
   display: inline-block;
@@ -794,6 +874,16 @@ html.dark .theme-icon-light {
 .col-due { width: 100px; }
 .col-priority { width: 80px; }
 .col-status { width: 100px; }
+.col-custom { width: 100px; }
+
+/* Custom Field Values */
+.custom-field-value {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  background: var(--color-bg-alt);
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
 
 /* Overdue text */
 .col-due.overdue {
@@ -870,6 +960,9 @@ html.dark .theme-icon-light {
 .timeline-table .col-due { width: 100px; }
 .timeline-table .col-bar { width: 300px; min-width: 200px; }
 .timeline-table .col-status { width: 100px; }
+.timeline-table .col-custom { width: 100px; }
+.timeline-table .col-tags { min-width: 100px; }
+.timeline-table .col-parent { width: 100px; }
 
 /* Timeline Bar */
 .timeline-bar-container {

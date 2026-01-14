@@ -29,4 +29,33 @@
       {{ task.priority }}
     </span>
   {% endif %}
+
+  {% if task.tags.length > 0 %}
+    <div class="card-tags">
+      {% for tag in task.tags %}
+        <span class="tag-badge">{{ tag }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if task.parentTask %}
+    <div class="card-parent">↳ {{ task.parentTask }}</div>
+  {% endif %}
+
+  {% if task.notes %}
+    <span class="card-notes-icon" title="{{ task.notes }}">📝</span>
+  {% endif %}
+
+  {% if task.customFields and tasks.customFieldNames.length > 0 %}
+    <div class="card-custom-fields">
+      {% for fieldName in tasks.customFieldNames %}
+        {% if task.customFields[fieldName] %}
+          <span class="custom-field">
+            <span class="custom-field-name">{{ fieldName }}:</span>
+            <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
+          </span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
 </div>

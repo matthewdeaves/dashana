@@ -206,3 +206,119 @@ describe('Data Processing with Test Fixture', () => {
   });
 });
 
+describe('Custom Fields', () => {
+  let data;
+
+  beforeAll(() => {
+    const records = loadTestData();
+    data = processRecords(records, new Date('2026-01-15'));
+  });
+
+  test('detects custom field names from CSV', () => {
+    expect(data.customFieldNames).toContain('Sprint');
+    expect(data.customFieldNames).toContain('Story Points');
+    expect(data.customFieldNames.length).toBe(2);
+  });
+
+  test('excludes known Asana fields from customFieldNames', () => {
+    expect(data.customFieldNames).not.toContain('Task ID');
+    expect(data.customFieldNames).not.toContain('Name');
+    expect(data.customFieldNames).not.toContain('Section/Column');
+    expect(data.customFieldNames).not.toContain('Priority');
+    expect(data.customFieldNames).not.toContain('Status');
+  });
+
+  test('tasks have customFields object with values', () => {
+    const taskOne = data.all.find(t => t.name === 'Task One');
+    expect(taskOne.customFields).not.toBeNull();
+    expect(taskOne.customFields['Sprint']).toBe('Sprint 1');
+    expect(taskOne.customFields['Story Points']).toBe('3');
+  });
+
+  test('handles tasks with partial custom field values', () => {
+    // Task Four has Story Points but no Sprint
+    const taskFour = data.all.find(t => t.name === 'Task Four');
+    expect(taskFour.customFields['Sprint']).toBeNull();
+    expect(taskFour.customFields['Story Points']).toBe('8');
+  });
+
+  test('handles tasks with no custom field values', () => {
+    // Task Six and Task Eight have no custom field values
+    const taskSix = data.all.find(t => t.name === 'Task Six');
+    expect(taskSix.customFields['Sprint']).toBeNull();
+    expect(taskSix.customFields['Story Points']).toBeNull();
+  });
+
+  test('returns empty customFieldNames for CSV without custom fields', () => {
+    const recordsWithoutCustomFields = [
+      { 'Task ID': '1', 'Name': 'Test', 'Section/Column': 'To do' }
+    ];
+    const result = processRecords(recordsWithoutCustomFields, new Date('2026-01-15'));
+    expect(result.customFieldNames).toEqual([]);
+  });
+
+  test('tasks have null customFields when no custom columns exist', () => {
+    const recordsWithoutCustomFields = [
+      { 'Task ID': '1', 'Name': 'Test', 'Section/Column': 'To do' }
+    ];
+    const result = processRecords(recordsWithoutCustomFields, new Date('2026-01-15'));
+    expect(result.all[0].customFields).toBeNull();
+  });
+});
+
+describe('Tags, Parent Task, and Notes', () => {
+  let data;
+
+  beforeAll(() => {
+    const records = loadTestData();
+    data = processRecords(records, new Date('2026-01-15'));
+  });
+
+  test('parses comma-separated tags into array', () => {
+    const taskOne = data.all.find(t => t.name === 'Task One');
+    expect(taskOne.tags).toEqual(['Frontend', 'UI']);
+  });
+
+  test('parses single tag into array', () => {
+    const taskTwo = data.all.find(t => t.name === 'Task Two');
+    expect(taskTwo.tags).toEqual(['Backend']);
+  });
+
+  test('handles empty tags as empty array', () => {
+    const taskSix = data.all.find(t => t.name === 'Task Six');
+    expect(taskSix.tags).toEqual([]);
+  });
+
+  test('trims whitespace from tags', () => {
+    // "Frontend, UI" should become ['Frontend', 'UI'] not ['Frontend', ' UI']
+    const taskOne = data.all.find(t => t.name === 'Task One');
+    expect(taskOne.tags[1]).toBe('UI');
+    expect(taskOne.tags[1]).not.toBe(' UI');
+  });
+
+  test('extracts parentTask when present', () => {
+    const taskThree = data.all.find(t => t.name === 'Task Three');
+    expect(taskThree.parentTask).toBe('Task One');
+  });
+
+  test('extracts parentTask for another subtask', () => {
+    const taskSeven = data.all.find(t => t.name === 'Task Seven');
+    expect(taskSeven.parentTask).toBe('Task One');
+  });
+
+  test('handles null parentTask when not present', () => {
+    const taskOne = data.all.find(t => t.name === 'Task One');
+    expect(taskOne.parentTask).toBeNull();
+  });
+
+  test('extracts notes when present', () => {
+    const taskOne = data.all.find(t => t.name === 'Task One');
+    expect(taskOne.notes).toBe('First task with important details');
+  });
+
+  test('handles empty notes as empty string', () => {
+    const taskSix = data.all.find(t => t.name === 'Task Six');
+    expect(taskSix.notes).toBe('');
+  });
+});
+

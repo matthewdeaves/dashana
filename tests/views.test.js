@@ -39,20 +39,21 @@ function loadPage(pagePath) {
 
 /*
  * Test fixture contains 8 tasks:
- * - Task One: To do, Alice, High, On track, due 2026-01-10
- * - Task Two: To do, Bob, Medium, At risk, due 2026-01-05
- * - Task Three: In Progress, Alice, Low, On track, due 2026-01-08
- * - Task Four: In Progress, unassigned, High, Off track, no due
- * - Task Five: Done, Bob, no priority, On track, due 2026-01-03
- * - Task Six: Done, unassigned, no priority, no status
- * - Task Seven: To do, unassigned, no priority, no status
- * - Task Eight: Completed, Alice, Medium, no status
+ * - Task One: To do, Alice, High, On track, due 2026-01-10, Sprint 1, 3 pts
+ * - Task Two: To do, Bob, Medium, At risk, due 2026-01-05, Sprint 1, 5 pts
+ * - Task Three: In Progress, Alice, Low, On track, due 2026-01-08, Sprint 2, 2 pts
+ * - Task Four: In Progress, unassigned, High, Off track, no due, no sprint, 8 pts
+ * - Task Five: Done, Bob, no priority, On track, due 2026-01-03, Sprint 1, no pts
+ * - Task Six: Done, unassigned, no priority, no status, no sprint, no pts
+ * - Task Seven: To do, unassigned, no priority, no status, Sprint 2, 1 pt
+ * - Task Eight: Completed, Alice, Medium, no status, no sprint, no pts
  *
  * Sections: To do (3), In Progress (2), Done (2), Completed (1)
  * Done tasks: 3 (Task Five, Task Six, Task Eight)
  * Status: On track (3), At risk (1), Off track (1), No status (3)
  * Priority: High (2), Medium (2), Low (1), No priority (3)
  * Assignees: Alice (3), Bob (2), Unassigned (3)
+ * Custom Fields: Sprint (Sprint 1: 3, Sprint 2: 2, empty: 3), Story Points (has value: 5, empty: 3)
  */
 
 describe('Dashboard View', () => {
@@ -390,5 +391,192 @@ describe('Cross-View Consistency', () => {
     expect(boardDone).toBe(3);
     expect(tasksDone).toBe(3);
     expect(timelineDone).toBe(3);
+  });
+});
+
+/*
+ * Custom Fields in Test Fixture:
+ * - Sprint: Sprint 1 (Tasks 1,2,5), Sprint 2 (Tasks 3,7), empty (Tasks 4,6,8)
+ * - Story Points: 3 (Task 1), 5 (Task 2), 2 (Task 3), 8 (Task 4), 1 (Task 7), empty (Tasks 5,6,8)
+ */
+describe('Custom Fields', () => {
+  describe('Tasks Table', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('tasks/index.html');
+    });
+
+    test('has custom field column headers', () => {
+      const headers = [];
+      $('.task-table th').each((i, el) => {
+        headers.push($(el).text().trim());
+      });
+
+      expect(headers).toContain('Sprint');
+      expect(headers).toContain('Story Points');
+    });
+
+    test('displays custom field values in table cells', () => {
+      const sprintValues = [];
+      $('.task-table tbody tr').each((i, el) => {
+        const customCells = $(el).find('.col-custom');
+        if (customCells.length >= 1) {
+          sprintValues.push($(customCells[0]).text().trim());
+        }
+      });
+
+      expect(sprintValues).toContain('Sprint 1');
+      expect(sprintValues).toContain('Sprint 2');
+    });
+
+    test('displays dash for empty custom field values', () => {
+      const html = $('.task-table').html();
+      // Tasks without values should show —
+      expect(html).toContain('—');
+    });
+  });
+
+  describe('Board Cards', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('board/index.html');
+    });
+
+    test('task cards display custom fields when present', () => {
+      const customFieldSections = $('.card-custom-fields').length;
+      // Only cards with at least one custom field value should have this section
+      expect(customFieldSections).toBeGreaterThan(0);
+    });
+
+    test('custom field values are displayed', () => {
+      const html = $('.board').html();
+      expect(html).toContain('Sprint 1');
+      expect(html).toContain('Story Points');
+    });
+  });
+
+  describe('Timeline Table', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('timeline/index.html');
+    });
+
+    test('has custom field column headers', () => {
+      const headers = [];
+      $('.timeline-table th').each((i, el) => {
+        headers.push($(el).text().trim());
+      });
+
+      expect(headers).toContain('Sprint');
+      expect(headers).toContain('Story Points');
+    });
+
+    test('displays custom field values in timeline rows', () => {
+      const html = $('.timeline-table').html();
+      expect(html).toContain('Sprint 1');
+      expect(html).toContain('Sprint 2');
+    });
+  });
+});
+
+/*
+ * Tags, Parent Task, and Notes in Test Fixture:
+ * - Tags: Frontend,UI (Task 1), Backend (Task 2), Frontend,Backend (Task 3), Completed (Task 5), Planning (Task 7)
+ * - Parent Task: Task One (Tasks 3,7)
+ * - Notes: Various tasks have notes, Task Six has none
+ */
+describe('Tags, Parent Task, and Notes', () => {
+  describe('Tasks Table', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('tasks/index.html');
+    });
+
+    test('has Tags, Parent, and Notes column headers', () => {
+      const headers = [];
+      $('.task-table th').each((i, el) => {
+        headers.push($(el).text().trim());
+      });
+
+      expect(headers).toContain('Tags');
+      expect(headers).toContain('Parent');
+      expect(headers).toContain('Notes');
+    });
+
+    test('displays tag badges', () => {
+      const tagBadges = $('.task-table .tag-badge').length;
+      expect(tagBadges).toBeGreaterThan(0);
+    });
+
+    test('displays specific tag values', () => {
+      const html = $('.task-table').html();
+      expect(html).toContain('Frontend');
+      expect(html).toContain('Backend');
+    });
+
+    test('displays parent task references', () => {
+      const parentRefs = $('.task-table .parent-ref').length;
+      expect(parentRefs).toBeGreaterThan(0);
+    });
+
+    test('displays notes preview', () => {
+      const notesPreviews = $('.task-table .notes-preview').length;
+      expect(notesPreviews).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Board Cards', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('board/index.html');
+    });
+
+    test('displays tag badges on cards', () => {
+      const cardTags = $('.card-tags').length;
+      expect(cardTags).toBeGreaterThan(0);
+    });
+
+    test('displays parent task reference on cards', () => {
+      const cardParents = $('.card-parent').length;
+      expect(cardParents).toBeGreaterThan(0);
+    });
+
+    test('displays notes icon on cards with notes', () => {
+      const notesIcons = $('.card-notes-icon').length;
+      expect(notesIcons).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Timeline Table', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('timeline/index.html');
+    });
+
+    test('has Tags and Parent column headers', () => {
+      const headers = [];
+      $('.timeline-table th').each((i, el) => {
+        headers.push($(el).text().trim());
+      });
+
+      expect(headers).toContain('Tags');
+      expect(headers).toContain('Parent');
+    });
+
+    test('displays tag badges in timeline', () => {
+      const tagBadges = $('.timeline-table .tag-badge').length;
+      expect(tagBadges).toBeGreaterThan(0);
+    });
+
+    test('displays notes icon in task name', () => {
+      const html = $('.timeline-table').html();
+      expect(html).toContain('📝');
+    });
   });
 });

@@ -24,6 +24,12 @@ permalink: /tasks/
           <th class="col-due">Due Date</th>
           <th class="col-priority">Priority</th>
           <th class="col-status">Status</th>
+          <th class="col-tags">Tags</th>
+          <th class="col-parent">Parent</th>
+          <th class="col-notes">Notes</th>
+          {% for fieldName in tasks.customFieldNames %}
+          <th class="col-custom">{{ fieldName }}</th>
+          {% endfor %}
         </tr>
       </thead>
       <tbody>
@@ -58,6 +64,38 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
+          <td class="col-tags">
+            {% if task.tags.length > 0 %}
+              {% for tag in task.tags %}
+                <span class="tag-badge">{{ tag }}</span>
+              {% endfor %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="col-parent">
+            {% if task.parentTask %}
+              <span class="parent-ref">{{ task.parentTask }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="col-notes" {% if task.notes %}title="{{ task.notes }}"{% endif %}>
+            {% if task.notes %}
+              <span class="notes-preview">{{ task.notes | truncate(25) }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          {% for fieldName in tasks.customFieldNames %}
+          <td class="col-custom">
+            {% if task.customFields and task.customFields[fieldName] %}
+              <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          {% endfor %}
         </tr>
         {% endfor %}
       </tbody>

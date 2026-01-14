@@ -2,6 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse/sync');
 
+// Standard Asana CSV fields - anything else is a custom field
+const KNOWN_FIELDS = [
+  'Task ID', 'Name', 'Section/Column',
+  'Assignee', 'Assignee Email',
+  'Start Date', 'Due Date',
+  'Priority', 'Status', 'Notes',
+  'Created At', 'Completed At', 'Last Modified',
+  'Tags', 'Projects', 'Parent task',
+  'Blocked By (Dependencies)', 'Blocking (Dependencies)'
+];
+
 module.exports = function() {
   const csvPath = path.join(__dirname, '../../data/project.csv');
 
@@ -16,7 +27,7 @@ module.exports = function() {
     return processRecords(records);
   } catch (e) {
     console.warn('data/project.csv not found:', e.message);
-    return { all: [], sections: {}, sectionNames: [], stats: {}, timeline: [], projectRange: { start: null, end: null, days: 0 } };
+    return { all: [], sections: {}, sectionNames: [], stats: {}, timeline: [], projectRange: { start: null, end: null, days: 0 }, customFieldNames: [] };
   }
 };
 
@@ -25,6 +36,13 @@ function processRecords(records, today = null) {
     today = new Date();
   }
   today.setHours(0, 0, 0, 0);
+
+  // Collect all custom field names (columns not in KNOWN_FIELDS)
+  const customFieldNames = records.length > 0
+    ? [...new Set(
+        records.flatMap(r => Object.keys(r).filter(k => !KNOWN_FIELDS.includes(k)))
+      )]
+    : [];
 
   // Extract unique section names in order of first appearance
   const sectionNamesSet = new Set();
@@ -42,6 +60,14 @@ function processRecords(records, today = null) {
 
   const tasks = records.map(record => {
     const section = record['Section/Column'] || 'Uncategorized';
+
+    // Extract custom field values for this record
+    const customFields = customFieldNames.length > 0
+      ? Object.fromEntries(
+          customFieldNames.map(name => [name, record[name] || null])
+        )
+      : null;
+
     return {
       id: record['Task ID'],
       name: record['Name'],
@@ -53,6 +79,11 @@ function processRecords(records, today = null) {
       priority: record['Priority'] || null,
       status: record['Status'] || null,
       notes: record['Notes'] || '',
+      tags: record['Tags']
+        ? record['Tags'].split(',').map(t => t.trim()).filter(Boolean)
+        : [],
+      parentTask: record['Parent task'] || null,
+      customFields: customFields,
       // Computed
       isOverdue: isOverdue(record['Due Date'], section, today),
       isDone: isDoneSection(section),
@@ -146,7 +177,8 @@ function processRecords(records, today = null) {
       start: projectStart ? projectStart.toISOString().split('T')[0] : null,
       end: projectEnd ? projectEnd.toISOString().split('T')[0] : null,
       days: projectSpan
-    }
+    },
+    customFieldNames
   };
 }
 

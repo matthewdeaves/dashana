@@ -66,7 +66,10 @@ function validateRecords(records) {
 }
 
 module.exports = function () {
-  const csvPath = path.join(__dirname, "../../data/project.csv");
+  // Allow override for testing (so tests never touch production CSV)
+  const csvPath =
+    process.env.DASHANA_CSV_PATH ||
+    path.join(__dirname, "../../data/project.csv");
 
   try {
     const content = fs.readFileSync(csvPath, "utf-8");

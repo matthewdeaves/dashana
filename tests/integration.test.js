@@ -14,10 +14,14 @@ const { execSync } = require("child_process");
 const { parse } = require("csv-parse/sync");
 const cheerio = require("cheerio");
 
-// Skip if not running integration tests
+// Skip if not running integration tests or if production CSV doesn't exist
 const isIntegration = process.env.TEST_TYPE === "integration";
+const productionCsvExists = fs.existsSync(
+  path.join(__dirname, "../data/project.csv"),
+);
 
-const describeIntegration = isIntegration ? describe : describe.skip;
+const describeIntegration =
+  isIntegration && productionCsvExists ? describe : describe.skip;
 
 function loadProductionCSV() {
   const csvPath = path.join(__dirname, "../data/project.csv");

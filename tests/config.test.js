@@ -77,72 +77,57 @@ describe("parseYesNo", () => {
 });
 
 describe("Config Module", () => {
-  const configPath = path.join(__dirname, "../dashana.config");
-  let originalConfig;
-
-  beforeAll(() => {
-    // Save original config
-    try {
-      originalConfig = fs.readFileSync(configPath, "utf-8");
-    } catch (_e) {
-      originalConfig = null;
-    }
-  });
-
-  afterAll(() => {
-    // Restore original config
-    if (originalConfig !== null) {
-      fs.writeFileSync(configPath, originalConfig);
-    }
-  });
+  // Use temp file for tests (never touch production config)
+  const tempConfigPath = path.join(__dirname, "fixtures/temp-test.config");
 
   afterEach(() => {
     // Clear require cache to reload config module fresh
     delete require.cache[require.resolve("../src/_data/config.js")];
+    // Clean up temp config
+    if (fs.existsSync(tempConfigPath)) {
+      fs.unlinkSync(tempConfigPath);
+    }
+    // Reset environment variable
+    delete process.env.DASHANA_CONFIG_PATH;
   });
 
   test("returns default values when config file is missing", () => {
-    // Temporarily rename config file
-    if (fs.existsSync(configPath)) {
-      fs.renameSync(configPath, `${configPath}.bak`);
-    }
+    // Point to non-existent file
+    process.env.DASHANA_CONFIG_PATH = path.join(
+      __dirname,
+      "fixtures/nonexistent.config",
+    );
 
-    try {
-      const configFn = require("../src/_data/config.js");
-      const config = configFn();
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
 
-      // Check default values
-      expect(config.projectName).toBe("Project Report");
-      expect(config.customerName).toBe("Customer");
-      expect(config.siteBase).toBe("");
+    // Check default values
+    expect(config.projectName).toBe("Project Report");
+    expect(config.customerName).toBe("Customer");
+    expect(config.siteBase).toBe("");
 
-      // All tabs default to true
-      expect(config.tabs.dashboard).toBe(true);
-      expect(config.tabs.board).toBe(true);
-      expect(config.tabs.tasks).toBe(true);
-      expect(config.tabs.timeline).toBe(true);
+    // All tabs default to true
+    expect(config.tabs.dashboard).toBe(true);
+    expect(config.tabs.board).toBe(true);
+    expect(config.tabs.tasks).toBe(true);
+    expect(config.tabs.timeline).toBe(true);
 
-      // All column options default to true
-      expect(config.tasksColumns.name).toBe(true);
-      expect(config.tasksColumns.notes).toBe(true);
-      expect(config.timelineColumns.duration).toBe(true);
-      expect(config.cardItems.tags).toBe(true);
-    } finally {
-      // Restore config file
-      if (fs.existsSync(`${configPath}.bak`)) {
-        fs.renameSync(`${configPath}.bak`, configPath);
-      }
-    }
+    // All column options default to true
+    expect(config.tasksColumns.name).toBe(true);
+    expect(config.tasksColumns.notes).toBe(true);
+    expect(config.timelineColumns.duration).toBe(true);
+    expect(config.cardItems.tags).toBe(true);
   });
 
   test("parses tab visibility settings", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `PROJECT_NAME=Test Project
 SHOW_BOARD=NO
 SHOW_TIMELINE=NO
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -156,13 +141,14 @@ SHOW_TIMELINE=NO
 
   test("parses tasks column settings", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `PROJECT_NAME=Test
 TASKS_COL_NOTES=NO
 TASKS_COL_TAGS=NO
 TASKS_COL_CUSTOM=NO
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -176,12 +162,13 @@ TASKS_COL_CUSTOM=NO
 
   test("parses timeline column settings", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `PROJECT_NAME=Test
 TIMELINE_COL_START=NO
 TIMELINE_COL_DURATION=NO
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -195,13 +182,14 @@ TIMELINE_COL_DURATION=NO
 
   test("parses card item settings", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `PROJECT_NAME=Test
 CARD_SHOW_TAGS=NO
 CARD_SHOW_NOTES=NO
 CARD_SHOW_CUSTOM=NO
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -215,13 +203,14 @@ CARD_SHOW_CUSTOM=NO
 
   test("ignores comment lines starting with #", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `# This is a comment
 PROJECT_NAME=Test Project
 # Another comment
 SHOW_BOARD=NO
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -233,13 +222,14 @@ SHOW_BOARD=NO
 
   test("ignores empty lines", () => {
     fs.writeFileSync(
-      configPath,
+      tempConfigPath,
       `PROJECT_NAME=Test Project
 
 CUSTOMER_NAME=Acme Corp
 
 `,
     );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -250,7 +240,8 @@ CUSTOMER_NAME=Acme Corp
   });
 
   test("handles values with equals signs", () => {
-    fs.writeFileSync(configPath, `PROJECT_NAME=Test = Project\n`);
+    fs.writeFileSync(tempConfigPath, `PROJECT_NAME=Test = Project\n`);
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");
@@ -261,7 +252,8 @@ CUSTOMER_NAME=Acme Corp
 
   test("handles very long config values", () => {
     const longValue = "A".repeat(1000);
-    fs.writeFileSync(configPath, `PROJECT_NAME=${longValue}\n`);
+    fs.writeFileSync(tempConfigPath, `PROJECT_NAME=${longValue}\n`);
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
 
     delete require.cache[require.resolve("../src/_data/config.js")];
     const configFn = require("../src/_data/config.js");

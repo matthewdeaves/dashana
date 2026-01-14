@@ -5,47 +5,18 @@ const cheerio = require("cheerio");
 
 const FIXTURE_CSV = path.join(__dirname, "fixtures/test-project.csv");
 const FIXTURE_CONFIG = path.join(__dirname, "fixtures/test-dashana.config");
-const PRODUCTION_CSV = path.join(__dirname, "../data/project.csv");
-const PRODUCTION_CONFIG = path.join(__dirname, "../dashana.config");
-const BACKUP_CSV = path.join(__dirname, "fixtures/production-backup.csv");
-const BACKUP_CONFIG = path.join(__dirname, "fixtures/production-backup.config");
 
-// Swap fixture data and config in, build, then restore production data
+// Build site using fixture data via environment variables (never touches production files)
 beforeAll(() => {
-  // Backup production CSV
-  if (fs.existsSync(PRODUCTION_CSV)) {
-    fs.copyFileSync(PRODUCTION_CSV, BACKUP_CSV);
-  }
-  // Backup production config
-  if (fs.existsSync(PRODUCTION_CONFIG)) {
-    fs.copyFileSync(PRODUCTION_CONFIG, BACKUP_CONFIG);
-  }
-
-  // Copy fixtures to project root
-  fs.copyFileSync(FIXTURE_CSV, PRODUCTION_CSV);
-  fs.copyFileSync(FIXTURE_CONFIG, PRODUCTION_CONFIG);
-
-  // Build site with fixture data and test config
-  execSync("npm run build", { cwd: path.join(__dirname, ".."), stdio: "pipe" });
-});
-
-afterAll(() => {
-  // Restore production CSV and config, then rebuild site
-  if (fs.existsSync(BACKUP_CSV)) {
-    fs.copyFileSync(BACKUP_CSV, PRODUCTION_CSV);
-    fs.unlinkSync(BACKUP_CSV);
-  }
-  if (fs.existsSync(BACKUP_CONFIG)) {
-    fs.copyFileSync(BACKUP_CONFIG, PRODUCTION_CONFIG);
-    fs.unlinkSync(BACKUP_CONFIG);
-  }
-  // Rebuild with original data so _site/ reflects production
-  if (fs.existsSync(PRODUCTION_CSV)) {
-    execSync("npm run build", {
-      cwd: path.join(__dirname, ".."),
-      stdio: "pipe",
-    });
-  }
+  execSync("npm run build", {
+    cwd: path.join(__dirname, ".."),
+    stdio: "pipe",
+    env: {
+      ...process.env,
+      DASHANA_CSV_PATH: FIXTURE_CSV,
+      DASHANA_CONFIG_PATH: FIXTURE_CONFIG,
+    },
+  });
 });
 
 function loadPage(pagePath) {

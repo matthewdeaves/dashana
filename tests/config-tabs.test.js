@@ -18,10 +18,6 @@ const TEST_CONFIG = path.join(
   __dirname,
   "fixtures/config-tabs-disabled.config",
 );
-const PRODUCTION_CSV = path.join(__dirname, "../data/project.csv");
-const PRODUCTION_CONFIG = path.join(__dirname, "../dashana.config");
-const BACKUP_CSV = path.join(__dirname, "fixtures/tabs-test-backup.csv");
-const BACKUP_CONFIG = path.join(__dirname, "fixtures/tabs-test-backup.config");
 const SITE_DIR = path.join(__dirname, "../_site");
 
 function loadPage(pagePath) {
@@ -33,35 +29,17 @@ function loadPage(pagePath) {
   return cheerio.load(html);
 }
 
+// Build site using fixture data via environment variables (never touches production files)
 beforeAll(() => {
-  if (fs.existsSync(PRODUCTION_CSV)) {
-    fs.copyFileSync(PRODUCTION_CSV, BACKUP_CSV);
-  }
-  if (fs.existsSync(PRODUCTION_CONFIG)) {
-    fs.copyFileSync(PRODUCTION_CONFIG, BACKUP_CONFIG);
-  }
-
-  fs.copyFileSync(FIXTURE_CSV, PRODUCTION_CSV);
-  fs.copyFileSync(TEST_CONFIG, PRODUCTION_CONFIG);
-
-  execSync("npm run build", { cwd: path.join(__dirname, ".."), stdio: "pipe" });
-});
-
-afterAll(() => {
-  if (fs.existsSync(BACKUP_CSV)) {
-    fs.copyFileSync(BACKUP_CSV, PRODUCTION_CSV);
-    fs.unlinkSync(BACKUP_CSV);
-  }
-  if (fs.existsSync(BACKUP_CONFIG)) {
-    fs.copyFileSync(BACKUP_CONFIG, PRODUCTION_CONFIG);
-    fs.unlinkSync(BACKUP_CONFIG);
-  }
-  if (fs.existsSync(PRODUCTION_CSV)) {
-    execSync("npm run build", {
-      cwd: path.join(__dirname, ".."),
-      stdio: "pipe",
-    });
-  }
+  execSync("npm run build", {
+    cwd: path.join(__dirname, ".."),
+    stdio: "pipe",
+    env: {
+      ...process.env,
+      DASHANA_CSV_PATH: FIXTURE_CSV,
+      DASHANA_CONFIG_PATH: TEST_CONFIG,
+    },
+  });
 });
 
 /*

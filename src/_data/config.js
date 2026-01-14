@@ -78,7 +78,10 @@ function setNestedValue(obj, pathStr, value) {
 }
 
 module.exports = function () {
-  const configPath = path.join(__dirname, "../../dashana.config");
+  // Allow override for testing (so tests never touch production config)
+  const configPath =
+    process.env.DASHANA_CONFIG_PATH ||
+    path.join(__dirname, "../../dashana.config");
 
   // Default config - everything shown
   const config = {

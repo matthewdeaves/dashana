@@ -1,6 +1,6 @@
 # Dashana
 
-Transform Asana CSV exports into beautiful static report websites.
+Share project status with customers who don't have access to your Asana instance. Export your Asana project to CSV, push to this template repo, and get a configurable status report published to GitHub Pages.
 
 ## Quick Start
 

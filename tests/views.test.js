@@ -740,7 +740,7 @@ describe("Subtask Ordering and Grouping", () => {
       expect(subtaskRows).toBe(4);
     });
 
-    test("subtasks appear after their parent task in timeline", () => {
+    test("tasks are sorted chronologically by start/due date", () => {
       const taskNames = [];
       $(".timeline-table tbody tr .col-name").each((_i, el) => {
         const text = $(el)
@@ -751,12 +751,20 @@ describe("Subtask Ordering and Grouping", () => {
         taskNames.push(text);
       });
 
+      // Task One (2026-01-01) should come before Task Two (2026-01-02)
+      const taskOneIndex = taskNames.indexOf("Task One");
       const taskTwoIndex = taskNames.indexOf("Task Two");
+      expect(taskOneIndex).toBeLessThan(taskTwoIndex);
+
+      // Task Two (2026-01-02) should come before Task Three (2026-01-03)
+      const taskThreeIndex = taskNames.indexOf("Task Three");
+      expect(taskTwoIndex).toBeLessThan(taskThreeIndex);
+
+      // Tasks without dates (Subtask A, Subtask B) should be at the end
       const subtaskAIndex = taskNames.indexOf("Subtask A");
       const subtaskBIndex = taskNames.indexOf("Subtask B");
-
-      expect(subtaskAIndex).toBe(taskTwoIndex + 1);
-      expect(subtaskBIndex).toBe(taskTwoIndex + 2);
+      expect(subtaskAIndex).toBeGreaterThan(taskThreeIndex);
+      expect(subtaskBIndex).toBeGreaterThan(taskThreeIndex);
     });
   });
 });

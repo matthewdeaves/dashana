@@ -375,27 +375,15 @@ function processRecords(records, today = null) {
     task.duration = calculateDuration(task.startDate, task.dueDate, today);
   });
 
-  // Sort for timeline view - keep subtasks with their parent
-  // First, sort parent tasks by section and date
-  const timelineParents = tasks.filter((t) => !t.isSubtask);
-  timelineParents.sort((a, b) => {
-    if (a.sectionOrder !== b.sectionOrder) {
-      return a.sectionOrder - b.sectionOrder;
-    }
+  // Sort for timeline view - pure chronological order by date
+  const timelineTasks = [...tasks].sort((a, b) => {
     const aDate = a.startDate || a.dueDate;
     const bDate = b.startDate || b.dueDate;
+    // Tasks without dates go to the end
     if (!aDate && !bDate) return 0;
     if (!aDate) return 1;
     if (!bDate) return -1;
     return new Date(aDate) - new Date(bDate);
-  });
-
-  // Rebuild timeline with subtasks after their parent
-  const timelineTasks = [];
-  timelineParents.forEach((parent) => {
-    timelineTasks.push(parent);
-    const subtasks = subtasksByParent[parent.name] || [];
-    subtasks.forEach((subtask) => timelineTasks.push(subtask));
   });
 
   return {

@@ -48,7 +48,7 @@ Pull improvements from the main Dashana template. Your `data/project.csv` and `d
 
 ```bash
 # One-time setup
-git remote add template <template-repo-url>
+git remote add template https://github.com/matthewdeaves/dashana.git
 
 # To sync
 git fetch template

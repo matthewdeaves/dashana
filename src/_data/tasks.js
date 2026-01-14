@@ -212,7 +212,7 @@ function processRecords(records, today = null) {
       customFields: customFields,
       // Computed
       isOverdue: isOverdue(record["Due Date"], section, today),
-      isDone: isDoneSection(section),
+      isDone: isDoneSection(section) || !!record["Completed At"],
       daysUntilDue: daysUntil(record["Due Date"], today),
       priorityOrder: priorityOrder(record.Priority),
       sectionOrder: sectionOrderMap[section] || 999,

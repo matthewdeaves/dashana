@@ -41,12 +41,14 @@ extract_date() {
   echo "$date" | tr '.' '-'
 }
 
-# Collect all valid version dates first (for versions.json)
+# Collect all valid version dates first (for versions.json), deduplicated
+declare -A SEEN_DATES
 VALID_DATES=()
 for TAG in $TAGS; do
   DATE=$(extract_date "$TAG")
-  if [ -n "$DATE" ]; then
+  if [ -n "$DATE" ] && [ -z "${SEEN_DATES[$DATE]:-}" ]; then
     VALID_DATES+=("$DATE")
+    SEEN_DATES[$DATE]=1
   fi
 done
 

@@ -31,7 +31,10 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addGlobalData("version", version);
   eleventyConfig.addGlobalData("buildDate", buildDate);
 
-  // Build pathPrefix: siteBase + optional version
+  // basePath: site base without version (for cross-version links)
+  eleventyConfig.addGlobalData("basePath", siteBase);
+
+  // pathPrefix: siteBase + optional version (for same-version links)
   let pathPrefix = siteBase;
   if (version) {
     pathPrefix = `${siteBase}/${version}`;

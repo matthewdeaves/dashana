@@ -59,6 +59,13 @@
         localStorage.setItem('filterOpenOnly', isFiltered);
       });
     }
+
+    var versionSelect = document.getElementById('version-select');
+    if (versionSelect) {
+      versionSelect.addEventListener('change', function() {
+        window.location.href = this.value;
+      });
+    }
   </script>
 </body>
 </html>

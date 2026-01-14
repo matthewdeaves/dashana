@@ -26,15 +26,19 @@
     </button>
 
     <div class="version-info">
-      {% if version %}
-        <span class="version-badge">{{ version }}</span>
-        <a href="{{ config.siteBase }}/" class="version-link">View Latest</a>
+      {% if versions.length > 0 %}
+        <select id="version-select" class="version-select" aria-label="Select report version">
+          <option value="{{ basePath }}/"{% if not version %} selected{% endif %}>
+            Latest ({{ buildDate }})
+          </option>
+          {% for ver in versions %}
+            <option value="{{ basePath }}/{{ ver }}/"{% if version == ver %} selected{% endif %}>
+              {{ ver }}
+            </option>
+          {% endfor %}
+        </select>
       {% else %}
         <span class="version-badge current">{{ buildDate }}</span>
-      {% endif %}
-
-      {% if versions.length > 0 %}
-        <a href="{{ config.siteBase }}/versions/" class="version-link">All Versions</a>
       {% endif %}
     </div>
   </div>

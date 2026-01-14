@@ -20,7 +20,7 @@ This phase addresses findings from the January 2026 code review that were NOT co
 | Config parser anti-pattern (47 if-statements) | **MEDIUM** | 11-C |
 | O(n²) subtask grouping performance | **LOW** | 11-C |
 | Missing test coverage for edge cases | **MEDIUM** | 11-D |
-| Failing tests cleanup | **HIGH** | 11-D |
+| Test verification & cleanup | **MEDIUM** | 11-D |
 | Additional code quality tools | **LOW** | 11-E |
 
 ---
@@ -94,6 +94,10 @@ src/_includes/components/*.njk
 - [ ] Document all `| safe` usages and verify they're safe
 - [ ] Verify `{{ task.name }}` etc. auto-escape HTML characters
 - [ ] Add test: task name with `<script>alert('xss')</script>` renders as text
+
+**Decision checkpoint after completing Task 11.1:**
+- If auto-escaping is working correctly → Skip Task 11.3, proceed to Task 11.2 (tests only)
+- If escaping gaps found → Implement Task 11.3 before Task 11.2
 
 ---
 
@@ -417,20 +421,20 @@ for (const task of tasks) {
 
 ## Session 11-D: Test Coverage Improvements
 
-### Task 11.9: Fix Failing Tests
+### Task 11.9: Verify Tests & Clean Up Warnings
 
-**Current state:** 8 tests failing related to test data/view assertions.
+**Current state:** All 206 tests passing (verified 2026-01-14). Coverage: 87.82% statements, 81.32% branches.
 
 **Steps:**
-1. Run `npm test` and analyze failures
-2. Determine if tests need updating or code needs fixing
-3. Fix test expectations or underlying code
-4. Ensure all tests pass
+1. Run `npm test` and verify all tests pass
+2. Review any console warnings in test output
+3. Suppress or fix spurious warnings (e.g., "config not found" in tests that don't need config)
+4. Ensure test output is clean and readable
 
 **Acceptance:**
 - [ ] `npm test` shows 0 failures
 - [ ] No tests skipped or commented out
-- [ ] Test output clean
+- [ ] Console warnings reviewed and addressed where appropriate
 
 ---
 
@@ -573,15 +577,21 @@ echo "npm run lint" > .husky/pre-commit
 
 ---
 
-### Task 11.14: Generate Code Coverage Report
+### Task 11.14: Document & Enforce Code Coverage
 
-Ensure test coverage is tracked:
+**Current state (verified 2026-01-14):**
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Statements | 87.82% | >80% | ✅ |
+| Branches | 81.32% | >70% | ✅ |
+| Functions | 97.95% | >80% | ✅ |
+| Lines | 89.13% | >80% | ✅ |
 
-```bash
-npm test -- --coverage
-```
+Coverage already exceeds targets. This task focuses on making coverage easily accessible and optionally enforcing it.
 
-Add coverage script to `package.json`:
+**Steps:**
+
+1. Add coverage script to `package.json`:
 ```json
 {
   "scripts": {
@@ -590,16 +600,27 @@ Add coverage script to `package.json`:
 }
 ```
 
-**Target coverage:**
-- Statements: >80%
-- Branches: >70%
-- Functions: >80%
-- Lines: >80%
+2. Add coverage directory to `.gitignore`:
+```
+coverage/
+```
+
+3. (Optional) Add coverage thresholds to `jest.config.js` to prevent regressions:
+```javascript
+coverageThreshold: {
+  global: {
+    statements: 80,
+    branches: 70,
+    functions: 80,
+    lines: 80
+  }
+}
+```
 
 **Acceptance:**
 - [ ] `npm run test:coverage` generates report
-- [ ] Coverage meets targets
-- [ ] Coverage report added to `.gitignore` (coverage/)
+- [ ] Coverage directory excluded from git
+- [ ] (Optional) Coverage thresholds enforced in Jest config
 
 ---
 
@@ -621,7 +642,7 @@ Add coverage script to `package.json`:
 - [ ] All tests pass after refactoring
 
 **Session 11-D (Test Coverage):**
-- [ ] All tests passing
+- [ ] All tests passing, warnings cleaned up
 - [ ] Edge case tests added
 - [ ] Integration tests data-independent
 
@@ -633,10 +654,10 @@ Add coverage script to `package.json`:
 **Final Verification:**
 ```bash
 npm run lint           # Should pass
-npm test               # Should pass (0 failures)
+npm test               # Should pass (206+ tests, 0 failures)
 npm run build          # Should succeed
 npm run validate:html  # Should pass (after build)
-npm run test:coverage  # Should show >80% coverage
+npm run test:coverage  # Should show >80% coverage (currently ~88%)
 ```
 
 ---
@@ -687,7 +708,7 @@ This phase addresses findings from the January 2026 code review not covered in P
 | Timeline div/zero | MEDIUM | Not addressed | 11-B |
 | O(n²) performance | LOW | Not addressed | 11-C |
 | Missing edge case tests | MEDIUM | Not addressed | 11-D |
-| Failing tests | HIGH | Not addressed | 11-D |
+| Test cleanup & warnings | MEDIUM | Tests now pass | 11-D |
 | HTML validation | LOW | Mentioned | 11-E |
 
 ---

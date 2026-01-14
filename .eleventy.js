@@ -3,6 +3,15 @@ module.exports = function (eleventyConfig) {
   const version = process.env.DASHANA_VERSION || null;
 
   eleventyConfig.addPassthroughCopy("src/css");
+  eleventyConfig.addWatchTarget("dashana.config");
+
+  // Clear config.js cache when dashana.config changes so it re-reads the file
+  eleventyConfig.on("eleventy.beforeWatch", (changedFiles) => {
+    if (changedFiles.some((file) => file.endsWith("dashana.config"))) {
+      const configPath = require.resolve("./src/_data/config.js");
+      delete require.cache[configPath];
+    }
+  });
 
   // Add version to global data
   eleventyConfig.addGlobalData("version", version);

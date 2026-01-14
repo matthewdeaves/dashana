@@ -28,18 +28,20 @@
               <div class="task-card {% if t.isDone %}is-done{% endif %} {% if t.isOverdue %}is-overdue{% endif %} is-subtask">
                 <div class="card-header">
                   <span class="task-name">{{ t.name }}</span>
-                  {% if t.isDone %}
-                    <span class="completion-label completion-done">Done</span>
-                  {% else %}
-                    <span class="completion-label completion-open">Open</span>
+                  {% if config.cardItems.progress %}
+                    {% if t.isDone %}
+                      <span class="completion-label completion-done">Done</span>
+                    {% else %}
+                      <span class="completion-label completion-open">Open</span>
+                    {% endif %}
                   {% endif %}
                 </div>
-                {% if t.assignee and t.assignee != 'Unassigned' %}
+                {% if config.cardItems.assignee and t.assignee and t.assignee != 'Unassigned' %}
                 <div class="card-meta">
                   <span class="task-assignee">{{ t.assignee }}</span>
                 </div>
                 {% endif %}
-                {% if t.notes %}
+                {% if config.cardItems.notes and t.notes %}
                   <span class="card-notes-icon" title="{{ t.notes }}">📝</span>
                 {% endif %}
               </div>

@@ -4,6 +4,12 @@ title: Dashboard
 permalink: /
 ---
 
+{% if not config.tabs.dashboard %}
+<div class="page-disabled">
+  <p>This view has been disabled in the configuration.</p>
+  <a href="{{ pathPrefix }}/{% if config.tabs.board %}board/{% elif config.tabs.tasks %}tasks/{% elif config.tabs.timeline %}timeline/{% endif %}">Go to {% if config.tabs.board %}Board{% elif config.tabs.tasks %}Tasks{% elif config.tabs.timeline %}Timeline{% endif %}</a>
+</div>
+{% else %}
 {% if tasks.error %}
 <div class="error-banner" role="alert">
   <strong>Data Error:</strong> {{ tasks.error.message }}
@@ -26,3 +32,4 @@ permalink: /
     {% include "components/metric-assignees.njk" %}
   </div>
 </div>
+{% endif %}

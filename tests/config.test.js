@@ -1,8 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 
-// Import the parseYesNo function for unit testing
-const { parseYesNo } = require("../src/_data/config.js");
+// Import the functions for unit testing
+const {
+  parseYesNo,
+  CONFIG_SCHEMA,
+  setNestedValue,
+} = require("../src/_data/config.js");
 
 describe("parseYesNo", () => {
   test('returns true for "YES"', () => {
@@ -253,5 +257,84 @@ CUSTOMER_NAME=Acme Corp
     const config = configFn();
 
     expect(config.projectName).toBe("Test = Project");
+  });
+
+  test("handles very long config values", () => {
+    const longValue = "A".repeat(1000);
+    fs.writeFileSync(configPath, `PROJECT_NAME=${longValue}\n`);
+
+    delete require.cache[require.resolve("../src/_data/config.js")];
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
+
+    expect(config.projectName).toBe(longValue);
+  });
+});
+
+describe("setNestedValue", () => {
+  test("sets simple property", () => {
+    const obj = { projectName: "old" };
+    setNestedValue(obj, "projectName", "new");
+    expect(obj.projectName).toBe("new");
+  });
+
+  test("sets nested property", () => {
+    const obj = { tabs: { dashboard: true } };
+    setNestedValue(obj, "tabs.dashboard", false);
+    expect(obj.tabs.dashboard).toBe(false);
+  });
+
+  test("sets deeply nested property", () => {
+    const obj = { a: { b: { c: 1 } } };
+    setNestedValue(obj, "a.b.c", 2);
+    expect(obj.a.b.c).toBe(2);
+  });
+});
+
+describe("CONFIG_SCHEMA", () => {
+  test("has all tab visibility options", () => {
+    expect(CONFIG_SCHEMA.SHOW_DASHBOARD).toEqual({
+      path: "tabs.dashboard",
+      type: "boolean",
+    });
+    expect(CONFIG_SCHEMA.SHOW_BOARD).toEqual({
+      path: "tabs.board",
+      type: "boolean",
+    });
+    expect(CONFIG_SCHEMA.SHOW_TASKS).toEqual({
+      path: "tabs.tasks",
+      type: "boolean",
+    });
+    expect(CONFIG_SCHEMA.SHOW_TIMELINE).toEqual({
+      path: "tabs.timeline",
+      type: "boolean",
+    });
+  });
+
+  test("has core settings as string type", () => {
+    expect(CONFIG_SCHEMA.PROJECT_NAME.type).toBe("string");
+    expect(CONFIG_SCHEMA.CUSTOMER_NAME.type).toBe("string");
+    expect(CONFIG_SCHEMA.SITE_BASE.type).toBe("string");
+  });
+
+  test("has all tasks column options", () => {
+    const tasksColKeys = Object.keys(CONFIG_SCHEMA).filter((k) =>
+      k.startsWith("TASKS_COL_"),
+    );
+    expect(tasksColKeys.length).toBe(11); // name, progress, section, assignee, due, priority, status, tags, parent, notes, custom
+  });
+
+  test("has all timeline column options", () => {
+    const timelineColKeys = Object.keys(CONFIG_SCHEMA).filter((k) =>
+      k.startsWith("TIMELINE_COL_"),
+    );
+    expect(timelineColKeys.length).toBe(11);
+  });
+
+  test("has all card item options", () => {
+    const cardKeys = Object.keys(CONFIG_SCHEMA).filter((k) =>
+      k.startsWith("CARD_SHOW_"),
+    );
+    expect(cardKeys.length).toBe(9); // progress, assignee, due, status, priority, tags, parent, notes, custom
   });
 });

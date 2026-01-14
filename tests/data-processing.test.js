@@ -546,6 +546,97 @@ describe("validateRecords", () => {
   });
 });
 
+describe("Edge Cases", () => {
+  beforeEach(() => {
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test("handles duplicate task names gracefully", () => {
+    const records = [
+      { Name: "Task A", "Section/Column": "To do" },
+      { Name: "Task A", "Section/Column": "Done" }, // duplicate
+      { Name: "Task B", "Section/Column": "To do" },
+    ];
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.all.length).toBe(3);
+    // Should log warning about duplicate
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  test("handles all tasks on same date without NaN", () => {
+    const records = [
+      { Name: "Task A", "Start Date": "2026-01-15", "Due Date": "2026-01-15" },
+      { Name: "Task B", "Start Date": "2026-01-15", "Due Date": "2026-01-15" },
+    ];
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.timeline.length).toBe(2);
+    // Timeline percentages should be valid numbers (no NaN/Infinity)
+    result.timeline.forEach((task) => {
+      if (task.timeline) {
+        expect(Number.isFinite(task.timeline.startPercent)).toBe(true);
+        expect(Number.isFinite(task.timeline.widthPercent)).toBe(true);
+      }
+    });
+    // Project span should be at least 1 day
+    expect(result.projectRange.days).toBeGreaterThanOrEqual(1);
+  });
+
+  test("handles empty CSV (zero tasks)", () => {
+    const result = processRecords([], new Date("2026-01-15"));
+    expect(result.all.length).toBe(0);
+    expect(result.stats.total).toBe(0);
+    expect(result.stats.completionPercent).toBe(0);
+    expect(result.sectionNames.length).toBe(0);
+  });
+
+  test("handles all tasks in done section", () => {
+    const records = [
+      { Name: "Task A", "Section/Column": "Done" },
+      { Name: "Task B", "Section/Column": "Completed" },
+    ];
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.stats.done).toBe(2);
+    expect(result.stats.total - result.stats.done).toBe(0);
+    expect(result.stats.completionPercent).toBe(100);
+  });
+
+  test("handles invalid date strings gracefully", () => {
+    const records = [
+      { Name: "Task", "Due Date": "not-a-date", "Section/Column": "To do" },
+      { Name: "Task2", "Due Date": "2026-99-99", "Section/Column": "To do" },
+    ];
+    // Should not throw
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.all.length).toBe(2);
+    // Invalid dates should not crash isOverdue calculation
+    // NaN dates are falsy, so these should not be marked overdue
+  });
+
+  test("handles fields with special characters", () => {
+    const records = [
+      {
+        Name: "Task",
+        "Section/Column": "To do",
+        "Custom: Field!": 'value<>&"',
+      },
+    ];
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.customFieldNames).toContain("Custom: Field!");
+    expect(result.all[0].customFields["Custom: Field!"]).toBe('value<>&"');
+  });
+
+  test("handles very long task names", () => {
+    const longName = "A".repeat(1000);
+    const records = [{ Name: longName, "Section/Column": "To do" }];
+    const result = processRecords(records, new Date("2026-01-15"));
+    expect(result.all[0].name).toBe(longName);
+  });
+});
+
 describe("calculateDuration", () => {
   test("calculates days inclusive start exclusive end", () => {
     const today = new Date("2026-01-10");

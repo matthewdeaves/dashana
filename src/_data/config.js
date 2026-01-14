@@ -10,6 +10,73 @@ function parseYesNo(value) {
   return v === "YES" || v === "Y" || v === "TRUE" || v === "1";
 }
 
+/**
+ * Configuration schema - maps config keys to nested paths and types.
+ * Adding new config options only requires adding a line here.
+ */
+const CONFIG_SCHEMA = {
+  // Core settings (string values)
+  PROJECT_NAME: { path: "projectName", type: "string" },
+  CUSTOMER_NAME: { path: "customerName", type: "string" },
+  SITE_BASE: { path: "siteBase", type: "string" },
+
+  // Tab visibility (boolean values)
+  SHOW_DASHBOARD: { path: "tabs.dashboard", type: "boolean" },
+  SHOW_BOARD: { path: "tabs.board", type: "boolean" },
+  SHOW_TASKS: { path: "tabs.tasks", type: "boolean" },
+  SHOW_TIMELINE: { path: "tabs.timeline", type: "boolean" },
+
+  // Tasks columns
+  TASKS_COL_NAME: { path: "tasksColumns.name", type: "boolean" },
+  TASKS_COL_PROGRESS: { path: "tasksColumns.progress", type: "boolean" },
+  TASKS_COL_SECTION: { path: "tasksColumns.section", type: "boolean" },
+  TASKS_COL_ASSIGNEE: { path: "tasksColumns.assignee", type: "boolean" },
+  TASKS_COL_DUE: { path: "tasksColumns.due", type: "boolean" },
+  TASKS_COL_PRIORITY: { path: "tasksColumns.priority", type: "boolean" },
+  TASKS_COL_STATUS: { path: "tasksColumns.status", type: "boolean" },
+  TASKS_COL_TAGS: { path: "tasksColumns.tags", type: "boolean" },
+  TASKS_COL_PARENT: { path: "tasksColumns.parent", type: "boolean" },
+  TASKS_COL_NOTES: { path: "tasksColumns.notes", type: "boolean" },
+  TASKS_COL_CUSTOM: { path: "tasksColumns.custom", type: "boolean" },
+
+  // Timeline columns
+  TIMELINE_COL_NAME: { path: "timelineColumns.name", type: "boolean" },
+  TIMELINE_COL_PROGRESS: { path: "timelineColumns.progress", type: "boolean" },
+  TIMELINE_COL_SECTION: { path: "timelineColumns.section", type: "boolean" },
+  TIMELINE_COL_START: { path: "timelineColumns.start", type: "boolean" },
+  TIMELINE_COL_DUE: { path: "timelineColumns.due", type: "boolean" },
+  TIMELINE_COL_DURATION: { path: "timelineColumns.duration", type: "boolean" },
+  TIMELINE_COL_STATUS: { path: "timelineColumns.status", type: "boolean" },
+  TIMELINE_COL_TAGS: { path: "timelineColumns.tags", type: "boolean" },
+  TIMELINE_COL_PARENT: { path: "timelineColumns.parent", type: "boolean" },
+  TIMELINE_COL_NOTES: { path: "timelineColumns.notes", type: "boolean" },
+  TIMELINE_COL_CUSTOM: { path: "timelineColumns.custom", type: "boolean" },
+
+  // Card items
+  CARD_SHOW_PROGRESS: { path: "cardItems.progress", type: "boolean" },
+  CARD_SHOW_ASSIGNEE: { path: "cardItems.assignee", type: "boolean" },
+  CARD_SHOW_DUE: { path: "cardItems.due", type: "boolean" },
+  CARD_SHOW_STATUS: { path: "cardItems.status", type: "boolean" },
+  CARD_SHOW_PRIORITY: { path: "cardItems.priority", type: "boolean" },
+  CARD_SHOW_TAGS: { path: "cardItems.tags", type: "boolean" },
+  CARD_SHOW_PARENT: { path: "cardItems.parent", type: "boolean" },
+  CARD_SHOW_NOTES: { path: "cardItems.notes", type: "boolean" },
+  CARD_SHOW_CUSTOM: { path: "cardItems.custom", type: "boolean" },
+};
+
+/**
+ * Set a nested property value using dot notation path.
+ * Example: setNestedValue(obj, 'tabs.dashboard', false)
+ */
+function setNestedValue(obj, pathStr, value) {
+  const parts = pathStr.split(".");
+  let current = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    current = current[parts[i]];
+  }
+  current[parts[parts.length - 1]] = value;
+}
+
 module.exports = function () {
   const configPath = path.join(__dirname, "../../dashana.config");
 
@@ -84,80 +151,13 @@ module.exports = function () {
       const key = line.substring(0, eqIndex).trim();
       const value = line.substring(eqIndex + 1).trim();
 
-      // Core settings
-      if (key === "PROJECT_NAME") config.projectName = value;
-      if (key === "CUSTOMER_NAME") config.customerName = value;
-      if (key === "SITE_BASE") config.siteBase = value;
-
-      // Tab visibility
-      if (key === "SHOW_DASHBOARD") config.tabs.dashboard = parseYesNo(value);
-      if (key === "SHOW_BOARD") config.tabs.board = parseYesNo(value);
-      if (key === "SHOW_TASKS") config.tabs.tasks = parseYesNo(value);
-      if (key === "SHOW_TIMELINE") config.tabs.timeline = parseYesNo(value);
-
-      // Tasks columns
-      if (key === "TASKS_COL_NAME")
-        config.tasksColumns.name = parseYesNo(value);
-      if (key === "TASKS_COL_PROGRESS")
-        config.tasksColumns.progress = parseYesNo(value);
-      if (key === "TASKS_COL_SECTION")
-        config.tasksColumns.section = parseYesNo(value);
-      if (key === "TASKS_COL_ASSIGNEE")
-        config.tasksColumns.assignee = parseYesNo(value);
-      if (key === "TASKS_COL_DUE") config.tasksColumns.due = parseYesNo(value);
-      if (key === "TASKS_COL_PRIORITY")
-        config.tasksColumns.priority = parseYesNo(value);
-      if (key === "TASKS_COL_STATUS")
-        config.tasksColumns.status = parseYesNo(value);
-      if (key === "TASKS_COL_TAGS")
-        config.tasksColumns.tags = parseYesNo(value);
-      if (key === "TASKS_COL_PARENT")
-        config.tasksColumns.parent = parseYesNo(value);
-      if (key === "TASKS_COL_NOTES")
-        config.tasksColumns.notes = parseYesNo(value);
-      if (key === "TASKS_COL_CUSTOM")
-        config.tasksColumns.custom = parseYesNo(value);
-
-      // Timeline columns
-      if (key === "TIMELINE_COL_NAME")
-        config.timelineColumns.name = parseYesNo(value);
-      if (key === "TIMELINE_COL_PROGRESS")
-        config.timelineColumns.progress = parseYesNo(value);
-      if (key === "TIMELINE_COL_SECTION")
-        config.timelineColumns.section = parseYesNo(value);
-      if (key === "TIMELINE_COL_START")
-        config.timelineColumns.start = parseYesNo(value);
-      if (key === "TIMELINE_COL_DUE")
-        config.timelineColumns.due = parseYesNo(value);
-      if (key === "TIMELINE_COL_DURATION")
-        config.timelineColumns.duration = parseYesNo(value);
-      if (key === "TIMELINE_COL_STATUS")
-        config.timelineColumns.status = parseYesNo(value);
-      if (key === "TIMELINE_COL_TAGS")
-        config.timelineColumns.tags = parseYesNo(value);
-      if (key === "TIMELINE_COL_PARENT")
-        config.timelineColumns.parent = parseYesNo(value);
-      if (key === "TIMELINE_COL_NOTES")
-        config.timelineColumns.notes = parseYesNo(value);
-      if (key === "TIMELINE_COL_CUSTOM")
-        config.timelineColumns.custom = parseYesNo(value);
-
-      // Card items
-      if (key === "CARD_SHOW_PROGRESS")
-        config.cardItems.progress = parseYesNo(value);
-      if (key === "CARD_SHOW_ASSIGNEE")
-        config.cardItems.assignee = parseYesNo(value);
-      if (key === "CARD_SHOW_DUE") config.cardItems.due = parseYesNo(value);
-      if (key === "CARD_SHOW_STATUS")
-        config.cardItems.status = parseYesNo(value);
-      if (key === "CARD_SHOW_PRIORITY")
-        config.cardItems.priority = parseYesNo(value);
-      if (key === "CARD_SHOW_TAGS") config.cardItems.tags = parseYesNo(value);
-      if (key === "CARD_SHOW_PARENT")
-        config.cardItems.parent = parseYesNo(value);
-      if (key === "CARD_SHOW_NOTES") config.cardItems.notes = parseYesNo(value);
-      if (key === "CARD_SHOW_CUSTOM")
-        config.cardItems.custom = parseYesNo(value);
+      // Look up key in schema
+      const schema = CONFIG_SCHEMA[key];
+      if (schema) {
+        const parsedValue =
+          schema.type === "boolean" ? parseYesNo(value) : value;
+        setNestedValue(config, schema.path, parsedValue);
+      }
     });
   } catch (_e) {
     console.warn("dashana.config not found, using defaults");
@@ -166,5 +166,7 @@ module.exports = function () {
   return config;
 };
 
-// Export parseYesNo for testing
+// Export for testing
 module.exports.parseYesNo = parseYesNo;
+module.exports.CONFIG_SCHEMA = CONFIG_SCHEMA;
+module.exports.setNestedValue = setNestedValue;

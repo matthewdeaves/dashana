@@ -8,9 +8,11 @@
     "test": "jest --runInBand --testPathIgnorePatterns=integration",
     "test:watch": "jest --watch --testPathIgnorePatterns=integration",
     "test:integration": "TEST_TYPE=integration jest tests/integration.test.js",
+    "test:coverage": "jest --coverage --testPathIgnorePatterns=integration",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "validate:html": "html-validate \"_site/**/*.html\""
   },
   "dependencies": {
     "@11ty/eleventy": "^3.1.2",
@@ -19,6 +21,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
     "cheerio": "^1.1.2",
+    "html-validate": "^10.5.0",
     "jest": "^30.2.0"
   }
 }

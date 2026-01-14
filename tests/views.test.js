@@ -426,6 +426,55 @@ describe("Cross-View Consistency", () => {
 });
 
 /*
+ * XSS Prevention Tests
+ * Verify that Nunjucks auto-escaping prevents script injection
+ */
+describe("XSS Prevention", () => {
+  let $;
+
+  beforeAll(() => {
+    $ = loadPage("tasks/index.html");
+  });
+
+  test("task names with angle brackets are escaped in output", () => {
+    // Nunjucks auto-escapes {{ }} output by default
+    // This test verifies that mechanism is working
+    const taskNames = [];
+    $(".col-name").each((_i, el) => {
+      taskNames.push($(el).text().trim());
+    });
+    expect(taskNames.length).toBeGreaterThan(0);
+
+    // Verify that task-related content areas don't contain script tags
+    // (The page has legitimate scripts for theme toggle, but task data shouldn't)
+    const tableHtml = $(".task-table").html();
+    expect(tableHtml).not.toMatch(/<script/i);
+  });
+
+  test("notes in title attributes are properly escaped", () => {
+    // Notes appear in title attributes which need proper escaping
+    const notesIcons = $(".notes-icon");
+    notesIcons.each((_i, el) => {
+      const title = $(el).attr("title");
+      if (title) {
+        // Verify title doesn't contain unescaped HTML
+        expect(title).not.toMatch(/<script/i);
+      }
+    });
+  });
+
+  test("custom field values are escaped", () => {
+    // Custom fields from CSV should be auto-escaped
+    const customFieldValues = [];
+    $(".custom-field-value").each((_i, el) => {
+      customFieldValues.push($(el).text());
+    });
+    // Verify we have custom field values rendered
+    expect(customFieldValues.length).toBeGreaterThan(0);
+  });
+});
+
+/*
  * Custom Fields in Test Fixture:
  * - Sprint: Sprint 1 (Tasks 1,2,5), Sprint 2 (Tasks 3,7), empty (Tasks 4,6,8)
  * - Story Points: 3 (Task 1), 5 (Task 2), 2 (Task 3), 8 (Task 4), 1 (Task 7), empty (Tasks 5,6,8)

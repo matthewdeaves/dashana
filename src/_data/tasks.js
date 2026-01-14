@@ -131,12 +131,27 @@ function processRecords(records, today = null) {
       : [];
 
   // Build a map of task names to their sections (for subtask inheritance)
+  // First occurrence wins - warn about duplicates that may cause incorrect inheritance
   const taskSectionMap = {};
+  const duplicateNames = new Set();
   records.forEach((record) => {
     if (record.Name && record["Section/Column"]) {
-      taskSectionMap[record.Name] = record["Section/Column"];
+      if (taskSectionMap[record.Name] !== undefined) {
+        duplicateNames.add(record.Name);
+      } else {
+        taskSectionMap[record.Name] = record["Section/Column"];
+      }
     }
   });
+
+  if (duplicateNames.size > 0) {
+    const names = Array.from(duplicateNames).slice(0, 5).join(", ");
+    const more =
+      duplicateNames.size > 5 ? ` (and ${duplicateNames.size - 5} more)` : "";
+    console.warn(
+      `CSV contains ${duplicateNames.size} duplicate task name(s). Subtask section inheritance may be incorrect for: ${names}${more}`,
+    );
+  }
 
   // Extract unique section names in order of first appearance
   // Subtasks inherit parent's section, skip "Uncategorized" if it only contains subtasks
@@ -236,39 +251,70 @@ function processRecords(records, today = null) {
   tasks.length = 0;
   sortedTasks.forEach((t) => tasks.push(t));
 
-  // Group by section dynamically
+  // Group by section dynamically - O(n) using single pass
   const sections = {};
   sectionNames.forEach((name) => {
-    sections[name] = tasks.filter((t) => t.section === name);
+    sections[name] = [];
+  });
+  tasks.forEach((t) => {
+    if (sections[t.section]) {
+      sections[t.section].push(t);
+    }
   });
 
-  // For each section, mark subtasks that have their parent in the same section
-  // and add subtasks array to parent tasks for easy template rendering
-  Object.keys(sections).forEach((sectionName) => {
-    const sectionTasks = sections[sectionName];
-    const taskNamesInSection = new Set(sectionTasks.map((t) => t.name));
+  // Build lookup maps for O(1) access - avoids O(n²) filtering
+  // Map: section -> Set of task names in that section
+  const taskNamesBySection = {};
+  // Map: section -> parentName -> subtasks array
+  const subtasksByParentInSection = {};
 
-    sectionTasks.forEach((task) => {
-      // Check if this is a subtask with parent in same section
-      task.parentInSameSection =
-        task.isSubtask &&
-        task.parentTask &&
-        taskNamesInSection.has(task.parentTask);
+  sectionNames.forEach((name) => {
+    taskNamesBySection[name] = new Set();
+    subtasksByParentInSection[name] = {};
+  });
 
-      // For parent tasks, collect their subtasks that are in same section
-      if (!task.isSubtask) {
-        task.subtasksInSection = sectionTasks.filter(
-          (t) => t.parentTask === task.name,
-        );
-        task.hasSubtasksInSection = task.subtasksInSection.length > 0;
+  // Single pass to build all lookup data - O(n)
+  tasks.forEach((task) => {
+    const section = task.section;
+    if (taskNamesBySection[section]) {
+      taskNamesBySection[section].add(task.name);
+    }
+    if (
+      task.isSubtask &&
+      task.parentTask &&
+      subtasksByParentInSection[section]
+    ) {
+      if (!subtasksByParentInSection[section][task.parentTask]) {
+        subtasksByParentInSection[section][task.parentTask] = [];
       }
-    });
+      subtasksByParentInSection[section][task.parentTask].push(task);
+    }
+  });
+
+  // Mark subtasks and parent relationships - O(n) with O(1) lookups
+  tasks.forEach((task) => {
+    const section = task.section;
+    // Check if this is a subtask with parent in same section
+    task.parentInSameSection =
+      task.isSubtask &&
+      task.parentTask &&
+      taskNamesBySection[section]?.has(task.parentTask);
+
+    // For parent tasks, collect their subtasks that are in same section
+    if (!task.isSubtask) {
+      task.subtasksInSection =
+        subtasksByParentInSection[section]?.[task.name] || [];
+      task.hasSubtasksInSection = task.subtasksInSection.length > 0;
+    }
   });
 
   // Calculate stats
   const stats = calculateStats(tasks, sections, sectionNames);
 
   // Calculate project date range for timeline
+  // Helper to validate date objects (invalid dates have NaN time value)
+  const isValidDate = (d) => d instanceof Date && !Number.isNaN(d.getTime());
+
   const tasksWithDates = tasks.filter((t) => t.startDate || t.dueDate);
   let projectStart = null;
   let projectEnd = null;
@@ -277,10 +323,13 @@ function processRecords(records, today = null) {
     const start = t.startDate ? new Date(t.startDate) : null;
     const end = t.dueDate ? new Date(t.dueDate) : null;
 
-    if (start && (!projectStart || start < projectStart)) projectStart = start;
-    if (end && (!projectEnd || end > projectEnd)) projectEnd = end;
+    // Only use valid dates for range calculation
+    if (isValidDate(start) && (!projectStart || start < projectStart))
+      projectStart = start;
+    if (isValidDate(end) && (!projectEnd || end > projectEnd)) projectEnd = end;
     // Also consider start dates for project end if no due date
-    if (start && (!projectEnd || start > projectEnd)) projectEnd = start;
+    if (isValidDate(start) && (!projectEnd || start > projectEnd))
+      projectEnd = start;
   });
 
   const projectSpan =

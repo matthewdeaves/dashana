@@ -36,7 +36,6 @@ permalink: /timeline/
           {% if config.timelineColumns.due %}<th scope="col" class="col-due">Due</th>{% endif %}
           {% if config.timelineColumns.duration %}<th scope="col" class="col-bar">Duration</th>{% endif %}
           {% if config.timelineColumns.status %}<th scope="col" class="col-status">Status</th>{% endif %}
-          {% if config.timelineColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
           {% if config.timelineColumns.parent %}<th scope="col" class="col-parent">Parent</th>{% endif %}
           {% if config.timelineColumns.notes %}<th scope="col" class="col-notes">Notes</th>{% endif %}
           {% if config.timelineColumns.custom %}
@@ -44,6 +43,7 @@ permalink: /timeline/
             <th scope="col" class="col-custom">{{ fieldName }}</th>
             {% endfor %}
           {% endif %}
+          {% if config.timelineColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
         </tr>
       </thead>
       <tbody>
@@ -107,17 +107,6 @@ permalink: /timeline/
             {% endif %}
           </td>
           {% endif %}
-          {% if config.timelineColumns.tags %}
-          <td class="col-tags">
-            {% if task.tags.length > 0 %}
-              {% for tag in task.tags %}
-                <span class="tag-badge">{{ tag }}</span>
-              {% endfor %}
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          {% endif %}
           {% if config.timelineColumns.parent %}
           <td class="col-parent">
             {% if task.parentTask %}
@@ -146,6 +135,17 @@ permalink: /timeline/
               {% endif %}
             </td>
             {% endfor %}
+          {% endif %}
+          {% if config.timelineColumns.tags %}
+          <td class="col-tags">
+            {% if task.tags.length > 0 %}
+              {% for tag in task.tags %}
+                <span class="tag-badge">{{ tag }}</span>
+              {% endfor %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
           {% endif %}
         </tr>
         {% endfor %}

@@ -1,36 +1,40 @@
 <div class="task-card {% if task.isDone %}is-done{% endif %} {% if task.isOverdue %}is-overdue{% endif %} {% if task.isSubtask %}is-subtask{% endif %}">
   <div class="card-header">
     <span class="task-name">{{ task.name }}</span>
-    {% if config.cardItems.notes and task.notes %}<span class="card-notes-icon" title="{{ task.notes }}">📝</span>{% endif %}
-    {% if config.cardItems.progress %}
-      {% if task.isDone %}
-        <span class="completion-label completion-done">Done</span>
-      {% else %}
-        <span class="completion-label completion-open">Open</span>
+    <div class="card-header-right">
+      {% if config.cardItems.notes and task.notes %}<span class="card-notes-icon" title="{{ task.notes }}">📝</span>{% endif %}
+      {% if config.cardItems.progress %}
+        {% if task.isDone %}
+          <span class="completion-label completion-done">Done</span>
+        {% else %}
+          <span class="completion-label completion-open">Open</span>
+        {% endif %}
       {% endif %}
-    {% endif %}
+    </div>
   </div>
 
-  <div class="card-meta">
+  {% if (config.cardItems.assignee and task.assignee and task.assignee != 'Unassigned') or (config.cardItems.due and task.dueDate) %}
+  <div class="card-info-row">
     {% if config.cardItems.assignee and task.assignee and task.assignee != 'Unassigned' %}
       <span class="task-assignee">{{ task.assignee }}</span>
     {% endif %}
-
     {% if config.cardItems.due and task.dueDate %}
       <span class="task-due {% if task.isOverdue %}overdue{% endif %}">
-        {{ task.dueDate }}
+        Due: {{ task.dueDate }}
       </span>
     {% endif %}
+  </div>
+  {% endif %}
 
+  {% if (config.cardItems.priority and task.priority and not task.isDone) or (config.cardItems.status and task.status) %}
+  <div class="card-badges-row">
+    {% if config.cardItems.priority and task.priority and not task.isDone %}
+      <span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span>
+    {% endif %}
     {% if config.cardItems.status and task.status %}
       <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">{% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %} {{ task.status }}</span>
     {% endif %}
   </div>
-
-  {% if config.cardItems.priority and task.priority and not task.isDone %}
-    <span class="priority-badge priority-{{ task.priority | lower }}">
-      {{ task.priority }}
-    </span>
   {% endif %}
 
   {% if config.cardItems.tags and task.tags.length > 0 %}

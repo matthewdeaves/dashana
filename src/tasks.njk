@@ -30,7 +30,6 @@ permalink: /tasks/
           {% if config.tasksColumns.due %}<th scope="col" class="col-due">Due Date</th>{% endif %}
           {% if config.tasksColumns.priority %}<th scope="col" class="col-priority">Priority</th>{% endif %}
           {% if config.tasksColumns.status %}<th scope="col" class="col-status">Status</th>{% endif %}
-          {% if config.tasksColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
           {% if config.tasksColumns.parent %}<th scope="col" class="col-parent">Parent</th>{% endif %}
           {% if config.tasksColumns.notes %}<th scope="col" class="col-notes">Notes</th>{% endif %}
           {% if config.tasksColumns.custom %}
@@ -38,6 +37,7 @@ permalink: /tasks/
             <th scope="col" class="col-custom">{{ fieldName }}</th>
             {% endfor %}
           {% endif %}
+          {% if config.tasksColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
         </tr>
       </thead>
       <tbody>
@@ -86,17 +86,6 @@ permalink: /tasks/
             {% endif %}
           </td>
           {% endif %}
-          {% if config.tasksColumns.tags %}
-          <td class="col-tags">
-            {% if task.tags.length > 0 %}
-              {% for tag in task.tags %}
-                <span class="tag-badge">{{ tag }}</span>
-              {% endfor %}
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          {% endif %}
           {% if config.tasksColumns.parent %}
           <td class="col-parent">
             {% if task.parentTask %}
@@ -125,6 +114,17 @@ permalink: /tasks/
               {% endif %}
             </td>
             {% endfor %}
+          {% endif %}
+          {% if config.tasksColumns.tags %}
+          <td class="col-tags">
+            {% if task.tags.length > 0 %}
+              {% for tag in task.tags %}
+                <span class="tag-badge">{{ tag }}</span>
+              {% endfor %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
           {% endif %}
         </tr>
         {% endfor %}

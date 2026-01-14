@@ -105,7 +105,7 @@ describe('Data Processing with Test Fixture', () => {
   });
 
   test('counts total tasks correctly', () => {
-    expect(data.stats.total).toBe(8);
+    expect(data.stats.total).toBe(10);
   });
 
   test('counts done tasks correctly', () => {
@@ -115,8 +115,8 @@ describe('Data Processing with Test Fixture', () => {
   });
 
   test('calculates completion percentage', () => {
-    // 3 done out of 8 = 37.5% rounds to 38%
-    expect(data.stats.completionPercent).toBe(38);
+    // 3 done out of 10 = 30%
+    expect(data.stats.completionPercent).toBe(30);
   });
 
   test('counts overdue tasks correctly', () => {
@@ -129,7 +129,8 @@ describe('Data Processing with Test Fixture', () => {
   });
 
   test('groups tasks by section', () => {
-    expect(data.stats.bySection['To do']).toBe(3);
+    // 3 original + 2 subtasks inheriting from Task Two
+    expect(data.stats.bySection['To do']).toBe(5);
     expect(data.stats.bySection['In Progress']).toBe(2);
     expect(data.stats.bySection['Done']).toBe(2);
     expect(data.stats.bySection['Completed']).toBe(1);
@@ -139,11 +140,11 @@ describe('Data Processing with Test Fixture', () => {
     // On track: Task One, Task Three, Task Five = 3
     // At risk: Task Two = 1
     // Off track: Task Four = 1
-    // No status: Task Six, Task Seven, Task Eight = 3
+    // No status: Task Six, Task Seven, Task Eight, Subtask A, Subtask B = 5
     expect(data.stats.byStatus['On track']).toBe(3);
     expect(data.stats.byStatus['At risk']).toBe(1);
     expect(data.stats.byStatus['Off track']).toBe(1);
-    expect(data.stats.byStatus['No status']).toBe(3);
+    expect(data.stats.byStatus['No status']).toBe(5);
   });
 
   test('status counts sum to total', () => {
@@ -155,7 +156,8 @@ describe('Data Processing with Test Fixture', () => {
     expect(data.stats.byPriority['High']).toBe(2);
     expect(data.stats.byPriority['Medium']).toBe(2);
     expect(data.stats.byPriority['Low']).toBe(1);
-    expect(data.stats.byPriority['No priority']).toBe(3);
+    // 3 original + 2 subtasks
+    expect(data.stats.byPriority['No priority']).toBe(5);
   });
 
   test('priority counts sum to total', () => {
@@ -166,7 +168,8 @@ describe('Data Processing with Test Fixture', () => {
   test('groups tasks by assignee', () => {
     expect(data.stats.byAssignee['Alice']).toBe(3);
     expect(data.stats.byAssignee['Bob']).toBe(2);
-    expect(data.stats.byAssignee['Unassigned']).toBe(3);
+    // 3 original + 2 subtasks
+    expect(data.stats.byAssignee['Unassigned']).toBe(5);
   });
 
   test('assignee counts sum to total', () => {
@@ -180,7 +183,7 @@ describe('Data Processing with Test Fixture', () => {
   });
 
   test('all tasks array contains all tasks', () => {
-    expect(data.all.length).toBe(8);
+    expect(data.all.length).toBe(10);
   });
 
   test('tasks have correct isDone flag', () => {
@@ -319,6 +322,74 @@ describe('Tags, Parent Task, and Notes', () => {
   test('handles empty notes as empty string', () => {
     const taskSix = data.all.find(t => t.name === 'Task Six');
     expect(taskSix.notes).toBe('');
+  });
+
+  test('subtasks without section inherit parent section', () => {
+    // Subtask A has parent "Task Two" which is in "To do" section
+    const subtaskA = data.all.find(t => t.name === 'Subtask A');
+    expect(subtaskA.section).toBe('To do');
+    expect(subtaskA.isSubtask).toBe(true);
+  });
+
+  test('subtasks inherit parent section and appear in correct column', () => {
+    // Subtask B has parent "Task Two" which is in "To do" section
+    const subtaskB = data.all.find(t => t.name === 'Subtask B');
+    expect(subtaskB.section).toBe('To do');
+    expect(subtaskB.isSubtask).toBe(true);
+    // Should be grouped with its parent's section
+    const toDoTasks = data.sections['To do'];
+    expect(toDoTasks.some(t => t.name === 'Subtask B')).toBe(true);
+  });
+
+  test('subtasks without parent still go to Uncategorized', () => {
+    // Test that tasks without section AND without parent go to Uncategorized
+    const records = [{
+      'Task ID': '99',
+      'Name': 'Orphan Task',
+      'Section/Column': '',
+      'Parent task': ''
+    }];
+    const result = processRecords(records, new Date('2026-01-15'));
+    expect(result.all[0].section).toBe('Uncategorized');
+  });
+
+  test('subtasks appear directly after their parent task in all array', () => {
+    // Subtask A and B have parent "Task Two"
+    const taskTwoIndex = data.all.findIndex(t => t.name === 'Task Two');
+    const subtaskAIndex = data.all.findIndex(t => t.name === 'Subtask A');
+    const subtaskBIndex = data.all.findIndex(t => t.name === 'Subtask B');
+
+    // Subtasks should come immediately after parent
+    expect(subtaskAIndex).toBe(taskTwoIndex + 1);
+    expect(subtaskBIndex).toBe(taskTwoIndex + 2);
+  });
+
+  test('subtasks appear directly after their parent in section array', () => {
+    // In the "To do" section, subtasks should follow their parent
+    const toDoTasks = data.sections['To do'];
+    const taskTwoIndex = toDoTasks.findIndex(t => t.name === 'Task Two');
+    const subtaskAIndex = toDoTasks.findIndex(t => t.name === 'Subtask A');
+    const subtaskBIndex = toDoTasks.findIndex(t => t.name === 'Subtask B');
+
+    expect(subtaskAIndex).toBe(taskTwoIndex + 1);
+    expect(subtaskBIndex).toBe(taskTwoIndex + 2);
+  });
+
+  test('parent task with subtasks maintains relative ordering', () => {
+    // Create a scenario with multiple parents and subtasks
+    const records = [
+      { 'Task ID': '1', 'Name': 'Parent A', 'Section/Column': 'To do', 'Priority': 'High', 'Parent task': '' },
+      { 'Task ID': '2', 'Name': 'Sub A1', 'Section/Column': '', 'Parent task': 'Parent A' },
+      { 'Task ID': '3', 'Name': 'Parent B', 'Section/Column': 'To do', 'Priority': 'Low', 'Parent task': '' },
+      { 'Task ID': '4', 'Name': 'Sub B1', 'Section/Column': '', 'Parent task': 'Parent B' },
+      { 'Task ID': '5', 'Name': 'Sub A2', 'Section/Column': '', 'Parent task': 'Parent A' },
+    ];
+    const result = processRecords(records, new Date('2026-01-15'));
+
+    // Order should be: Parent A, Sub A1, Sub A2, Parent B, Sub B1
+    // (Parent A has High priority, Parent B has Low)
+    const names = result.all.map(t => t.name);
+    expect(names).toEqual(['Parent A', 'Sub A1', 'Sub A2', 'Parent B', 'Sub B1']);
   });
 });
 

@@ -34,8 +34,8 @@ permalink: /tasks/
       </thead>
       <tbody>
         {% for task in tasks.all %}
-        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %}">
-          <td class="col-name">{{ task.name }}</td>
+        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if task.isSubtask %}row-subtask{% endif %}">
+          <td class="col-name">{% if task.isSubtask %}<span class="subtask-indent">↳</span> {% endif %}{{ task.name }}</td>
           <td class="col-completion">
             {% if task.isDone %}
               <span class="completion-label completion-done">Done</span>
@@ -80,9 +80,9 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
-          <td class="col-notes" {% if task.notes %}title="{{ task.notes }}"{% endif %}>
+          <td class="col-notes">
             {% if task.notes %}
-              <span class="notes-preview">{{ task.notes | truncate(25) }}</span>
+              <span class="notes-icon" title="{{ task.notes }}">📝</span>
             {% else %}
               —
             {% endif %}

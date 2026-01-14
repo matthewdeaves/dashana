@@ -38,7 +38,7 @@ function loadPage(pagePath) {
 }
 
 /*
- * Test fixture contains 8 tasks:
+ * Test fixture contains 10 tasks:
  * - Task One: To do, Alice, High, On track, due 2026-01-10, Sprint 1, 3 pts
  * - Task Two: To do, Bob, Medium, At risk, due 2026-01-05, Sprint 1, 5 pts
  * - Task Three: In Progress, Alice, Low, On track, due 2026-01-08, Sprint 2, 2 pts
@@ -47,13 +47,15 @@ function loadPage(pagePath) {
  * - Task Six: Done, unassigned, no priority, no status, no sprint, no pts
  * - Task Seven: To do, unassigned, no priority, no status, Sprint 2, 1 pt
  * - Task Eight: Completed, Alice, Medium, no status, no sprint, no pts
+ * - Subtask A: To do (inherited), unassigned, no priority, no status, Sprint 1, parent: Task Two
+ * - Subtask B: To do (inherited), unassigned, no priority, no status, no sprint, parent: Task Two
  *
- * Sections: To do (3), In Progress (2), Done (2), Completed (1)
+ * Sections: To do (5 - 3 original + 2 subtasks), In Progress (2), Done (2), Completed (1)
  * Done tasks: 3 (Task Five, Task Six, Task Eight)
- * Status: On track (3), At risk (1), Off track (1), No status (3)
- * Priority: High (2), Medium (2), Low (1), No priority (3)
- * Assignees: Alice (3), Bob (2), Unassigned (3)
- * Custom Fields: Sprint (Sprint 1: 3, Sprint 2: 2, empty: 3), Story Points (has value: 5, empty: 3)
+ * Status: On track (3), At risk (1), Off track (1), No status (5)
+ * Priority: High (2), Medium (2), Low (1), No priority (5)
+ * Assignees: Alice (3), Bob (2), Unassigned (5)
+ * Custom Fields: Sprint (Sprint 1: 4, Sprint 2: 2, empty: 4), Story Points (has value: 5, empty: 5)
  */
 
 describe('Dashboard View', () => {
@@ -65,14 +67,14 @@ describe('Dashboard View', () => {
 
   test('displays correct total task count', () => {
     const subtitle = $('.dashboard-subtitle').text();
-    expect(subtitle).toContain('8 total tasks');
+    expect(subtitle).toContain('10 total tasks');
   });
 
   test('displays correct completion stats', () => {
     const percent = $('.completion-percent').text();
     const detail = $('.completion-detail').text();
-    expect(percent).toBe('38%'); // 3/8 = 37.5% rounds to 38%
-    expect(detail).toBe('3 of 8 done');
+    expect(percent).toBe('30%'); // 3/10 = 30%
+    expect(detail).toBe('3 of 10 done');
   });
 
   test('displays all sections with correct counts', () => {
@@ -83,13 +85,13 @@ describe('Dashboard View', () => {
       sections.push({ name, count });
     });
 
-    expect(sections).toContainEqual({ name: 'To do', count: 3 });
+    expect(sections).toContainEqual({ name: 'To do', count: 5 }); // 3 + 2 subtasks
     expect(sections).toContainEqual({ name: 'In Progress', count: 2 });
     expect(sections).toContainEqual({ name: 'Done', count: 2 });
     expect(sections).toContainEqual({ name: 'Completed', count: 1 });
 
     const total = sections.reduce((sum, s) => sum + s.count, 0);
-    expect(total).toBe(8);
+    expect(total).toBe(10);
   });
 
   test('displays all statuses with correct counts including "No status"', () => {
@@ -103,10 +105,10 @@ describe('Dashboard View', () => {
     expect(statuses).toContainEqual({ name: 'On track', count: 3 });
     expect(statuses).toContainEqual({ name: 'At risk', count: 1 });
     expect(statuses).toContainEqual({ name: 'Off track', count: 1 });
-    expect(statuses).toContainEqual({ name: 'No status', count: 3 });
+    expect(statuses).toContainEqual({ name: 'No status', count: 5 }); // 3 + 2 subtasks
 
     const total = statuses.reduce((sum, s) => sum + s.count, 0);
-    expect(total).toBe(8);
+    expect(total).toBe(10);
   });
 
   test('displays all priorities with correct counts including "No priority"', () => {
@@ -120,10 +122,10 @@ describe('Dashboard View', () => {
     expect(priorities).toContainEqual({ name: 'High', count: 2 });
     expect(priorities).toContainEqual({ name: 'Medium', count: 2 });
     expect(priorities).toContainEqual({ name: 'Low', count: 1 });
-    expect(priorities).toContainEqual({ name: 'No priority', count: 3 });
+    expect(priorities).toContainEqual({ name: 'No priority', count: 5 }); // 3 + 2 subtasks
 
     const total = priorities.reduce((sum, p) => sum + p.count, 0);
-    expect(total).toBe(8);
+    expect(total).toBe(10);
   });
 
   test('displays all assignees with correct counts', () => {
@@ -136,10 +138,10 @@ describe('Dashboard View', () => {
 
     expect(assignees).toContainEqual({ name: 'Alice', count: 3 });
     expect(assignees).toContainEqual({ name: 'Bob', count: 2 });
-    expect(assignees).toContainEqual({ name: 'Unassigned', count: 3 });
+    expect(assignees).toContainEqual({ name: 'Unassigned', count: 5 }); // 3 + 2 subtasks
 
     const total = assignees.reduce((sum, a) => sum + a.count, 0);
-    expect(total).toBe(8);
+    expect(total).toBe(10);
   });
 
   test('displays overdue count', () => {
@@ -159,7 +161,7 @@ describe('Board View', () => {
 
   test('displays correct total in subtitle', () => {
     const subtitle = $('.page-subtitle').text();
-    expect(subtitle).toContain('8 tasks');
+    expect(subtitle).toContain('10 tasks');
   });
 
   test('has all 4 columns', () => {
@@ -167,14 +169,14 @@ describe('Board View', () => {
     expect(columns).toBe(4);
   });
 
-  test('displays all 8 task cards', () => {
+  test('displays all 10 task cards', () => {
     const cards = $('.task-card').length;
-    expect(cards).toBe(8);
+    expect(cards).toBe(10);
   });
 
   test('each task has a completion label', () => {
     const labels = $('.completion-label').length;
-    expect(labels).toBe(8);
+    expect(labels).toBe(10);
   });
 
   test('done tasks have "Done" completion label', () => {
@@ -184,7 +186,7 @@ describe('Board View', () => {
 
   test('open tasks have "Open" completion label', () => {
     const openLabels = $('.completion-open').length;
-    expect(openLabels).toBe(5); // 5 tasks not in Done/Completed sections
+    expect(openLabels).toBe(7); // 7 tasks not in Done/Completed sections (5 + 2 subtasks)
   });
 
   test('columns show progress counts', () => {
@@ -228,17 +230,17 @@ describe('Tasks View', () => {
 
   test('displays correct total in subtitle', () => {
     const subtitle = $('.page-subtitle').text();
-    expect(subtitle).toContain('8 tasks');
+    expect(subtitle).toContain('10 tasks');
   });
 
-  test('has all 8 task rows', () => {
+  test('has all 10 task rows', () => {
     const rows = $('.task-table tbody tr').length;
-    expect(rows).toBe(8);
+    expect(rows).toBe(10);
   });
 
   test('each row has a completion label in its own column', () => {
     const labels = $('.task-table .col-completion .completion-label').length;
-    expect(labels).toBe(8);
+    expect(labels).toBe(10);
   });
 
   test('done tasks have "Done" completion label', () => {
@@ -275,17 +277,17 @@ describe('Timeline View', () => {
 
   test('displays correct total in subtitle', () => {
     const subtitle = $('.page-subtitle').text();
-    expect(subtitle).toContain('8 tasks');
+    expect(subtitle).toContain('10 tasks');
   });
 
-  test('has all 8 task rows', () => {
+  test('has all 10 task rows', () => {
     const rows = $('.timeline-table tbody tr').length;
-    expect(rows).toBe(8);
+    expect(rows).toBe(10);
   });
 
   test('each row has a completion label in its own column', () => {
     const labels = $('.timeline-table .col-completion .completion-label').length;
-    expect(labels).toBe(8);
+    expect(labels).toBe(10);
   });
 
   test('done tasks have "Done" completion label', () => {
@@ -295,8 +297,8 @@ describe('Timeline View', () => {
 
   test('tasks without dates show "No dates" label', () => {
     const noDateLabels = $('.no-dates-label').length;
-    // 3 tasks without dates: Task Four, Task Six, Task Seven, Task Eight
-    expect(noDateLabels).toBe(4);
+    // 6 tasks without dates: Task Four, Task Six, Task Seven, Task Eight, Subtask A, Subtask B
+    expect(noDateLabels).toBe(6);
   });
 
   test('tasks with dates have timeline bars', () => {
@@ -367,10 +369,10 @@ describe('Cross-View Consistency', () => {
     const tasksTotal = tasks('.page-subtitle').text().match(/(\d+) tasks/)?.[1];
     const timelineTotal = timeline('.page-subtitle').text().match(/(\d+) tasks/)?.[1];
 
-    expect(dashboardTotal).toBe('8');
-    expect(boardTotal).toBe('8');
-    expect(tasksTotal).toBe('8');
-    expect(timelineTotal).toBe('8');
+    expect(dashboardTotal).toBe('10');
+    expect(boardTotal).toBe('10');
+    expect(tasksTotal).toBe('10');
+    expect(timelineTotal).toBe('10');
   });
 
   test('all views have same number of task elements', () => {
@@ -378,9 +380,9 @@ describe('Cross-View Consistency', () => {
     const tasksRows = tasks('.task-table tbody tr').length;
     const timelineRows = timeline('.timeline-table tbody tr').length;
 
-    expect(boardCards).toBe(8);
-    expect(tasksRows).toBe(8);
-    expect(timelineRows).toBe(8);
+    expect(boardCards).toBe(10);
+    expect(tasksRows).toBe(10);
+    expect(timelineRows).toBe(10);
   });
 
   test('all views have same number of done tasks', () => {
@@ -523,9 +525,9 @@ describe('Tags, Parent Task, and Notes', () => {
       expect(parentRefs).toBeGreaterThan(0);
     });
 
-    test('displays notes preview', () => {
-      const notesPreviews = $('.task-table .notes-preview').length;
-      expect(notesPreviews).toBeGreaterThan(0);
+    test('displays notes icon', () => {
+      const notesIcons = $('.task-table .notes-icon').length;
+      expect(notesIcons).toBeGreaterThan(0);
     });
   });
 
@@ -577,6 +579,102 @@ describe('Tags, Parent Task, and Notes', () => {
     test('displays notes icon in task name', () => {
       const html = $('.timeline-table').html();
       expect(html).toContain('📝');
+    });
+  });
+});
+
+/*
+ * Subtask Ordering Tests
+ * Subtasks should appear directly after their parent task in all views
+ * Test fixture: Subtask A and Subtask B are children of Task Two
+ */
+describe('Subtask Ordering and Grouping', () => {
+  describe('Board View', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('board/index.html');
+    });
+
+    test('subtask cards have is-subtask class', () => {
+      const subtaskCards = $('.task-card.is-subtask').length;
+      // Task Three, Task Seven (parent: Task One), Subtask A, Subtask B (parent: Task Two)
+      expect(subtaskCards).toBe(4);
+    });
+
+    test('subtasks appear after their parent task', () => {
+      // Get all task names in order from the To do column
+      const taskNames = [];
+      $('.task-card .task-name').each((i, el) => {
+        taskNames.push($(el).text().trim());
+      });
+
+      const taskTwoIndex = taskNames.indexOf('Task Two');
+      const subtaskAIndex = taskNames.indexOf('Subtask A');
+      const subtaskBIndex = taskNames.indexOf('Subtask B');
+
+      // Subtasks should come immediately after parent
+      expect(subtaskAIndex).toBe(taskTwoIndex + 1);
+      expect(subtaskBIndex).toBe(taskTwoIndex + 2);
+    });
+  });
+
+  describe('Tasks Table', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('tasks/index.html');
+    });
+
+    test('subtask rows have row-subtask class', () => {
+      const subtaskRows = $('.task-table .row-subtask').length;
+      // Task Three, Task Seven, Subtask A, Subtask B
+      expect(subtaskRows).toBe(4);
+    });
+
+    test('subtasks appear after their parent task in table', () => {
+      const taskNames = [];
+      $('.task-table tbody tr .col-name').each((i, el) => {
+        // Extract task name (may have subtask indent prefix)
+        const text = $(el).text().trim().replace(/^↳\s*/, '');
+        taskNames.push(text);
+      });
+
+      const taskTwoIndex = taskNames.indexOf('Task Two');
+      const subtaskAIndex = taskNames.indexOf('Subtask A');
+      const subtaskBIndex = taskNames.indexOf('Subtask B');
+
+      expect(subtaskAIndex).toBe(taskTwoIndex + 1);
+      expect(subtaskBIndex).toBe(taskTwoIndex + 2);
+    });
+  });
+
+  describe('Timeline View', () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage('timeline/index.html');
+    });
+
+    test('subtask rows have row-subtask class', () => {
+      const subtaskRows = $('.timeline-table .row-subtask').length;
+      // Task Three, Task Seven (parent: Task One), Subtask A, Subtask B (parent: Task Two)
+      expect(subtaskRows).toBe(4);
+    });
+
+    test('subtasks appear after their parent task in timeline', () => {
+      const taskNames = [];
+      $('.timeline-table tbody tr .col-name').each((i, el) => {
+        const text = $(el).text().trim().replace(/^↳\s*/, '').replace(/\s*📝.*$/, '');
+        taskNames.push(text);
+      });
+
+      const taskTwoIndex = taskNames.indexOf('Task Two');
+      const subtaskAIndex = taskNames.indexOf('Subtask A');
+      const subtaskBIndex = taskNames.indexOf('Subtask B');
+
+      expect(subtaskAIndex).toBe(taskTwoIndex + 1);
+      expect(subtaskBIndex).toBe(taskTwoIndex + 2);
     });
   });
 });

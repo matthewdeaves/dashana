@@ -76,11 +76,63 @@ Templates (*.njk) ──────► _site/ (static HTML)
 
 ## Configuration
 
-**dashana.config** - Customer settings:
-```
+**dashana.config** - Customer settings (key=value format, supports # comments):
+
+```ini
+# Core Settings
 PROJECT_NAME=My Project
 CUSTOMER_NAME=Acme Corp
 SITE_BASE=              # Optional: for subdirectory deployment (e.g., /dashana)
+
+# Tab Visibility (all YES by default, set NO to hide)
+SHOW_DASHBOARD=YES
+SHOW_BOARD=YES
+SHOW_TASKS=YES
+SHOW_TIMELINE=YES
+
+# Tasks Table Columns (all YES by default)
+TASKS_COL_NAME=YES
+TASKS_COL_PROGRESS=YES
+TASKS_COL_SECTION=YES
+TASKS_COL_ASSIGNEE=YES
+TASKS_COL_DUE=YES
+TASKS_COL_PRIORITY=YES
+TASKS_COL_STATUS=YES
+TASKS_COL_TAGS=YES
+TASKS_COL_PARENT=YES
+TASKS_COL_NOTES=YES
+TASKS_COL_CUSTOM=YES
+
+# Timeline Table Columns (all YES by default)
+TIMELINE_COL_NAME=YES
+TIMELINE_COL_PROGRESS=YES
+TIMELINE_COL_SECTION=YES
+TIMELINE_COL_START=YES
+TIMELINE_COL_DUE=YES
+TIMELINE_COL_DURATION=YES
+TIMELINE_COL_STATUS=YES
+TIMELINE_COL_TAGS=YES
+TIMELINE_COL_PARENT=YES
+TIMELINE_COL_CUSTOM=YES
+
+# Board Card Items (all YES by default)
+CARD_SHOW_PROGRESS=YES
+CARD_SHOW_ASSIGNEE=YES
+CARD_SHOW_DUE=YES
+CARD_SHOW_STATUS=YES
+CARD_SHOW_PRIORITY=YES
+CARD_SHOW_TAGS=YES
+CARD_SHOW_PARENT=YES
+CARD_SHOW_NOTES=YES
+CARD_SHOW_CUSTOM=YES
+```
+
+**Minimal config** (only override what you need):
+```ini
+PROJECT_NAME=My Project
+CUSTOMER_NAME=Acme Corp
+SHOW_TIMELINE=NO
+TASKS_COL_NOTES=NO
 ```
 
 ## CSS Architecture

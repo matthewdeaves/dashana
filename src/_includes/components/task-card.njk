@@ -1,6 +1,7 @@
-<div class="task-card {% if task.isDone %}is-done{% endif %} {% if task.isOverdue %}is-overdue{% endif %}">
+<div class="task-card {% if task.isDone %}is-done{% endif %} {% if task.isOverdue %}is-overdue{% endif %} {% if task.isSubtask %}is-subtask{% endif %}">
   <div class="card-header">
     <span class="task-name">{{ task.name }}</span>
+    {% if task.notes %}<span class="card-notes-icon" title="{{ task.notes }}">📝</span>{% endif %}
     {% if task.isDone %}
       <span class="completion-label completion-done">Done</span>
     {% else %}
@@ -40,10 +41,6 @@
 
   {% if task.parentTask %}
     <div class="card-parent">↳ {{ task.parentTask }}</div>
-  {% endif %}
-
-  {% if task.notes %}
-    <span class="card-notes-icon" title="{{ task.notes }}">📝</span>
   {% endif %}
 
   {% if task.customFields and tasks.customFieldNames.length > 0 %}

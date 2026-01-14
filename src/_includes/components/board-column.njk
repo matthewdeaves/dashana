@@ -17,7 +17,39 @@
   </div>
   <div class="column-cards">
     {% for task in columnTasks %}
-      {% include "components/task-card.njk" %}
+      {% if task.parentInSameSection %}
+        {# Skip - this subtask will be rendered under its parent #}
+      {% elif task.hasSubtasksInSection %}
+        {# This is a parent with subtasks - render as group #}
+        <div class="task-group">
+          {% include "components/task-card.njk" %}
+          <div class="subtasks-container">
+            {% for t in task.subtasksInSection %}
+              <div class="task-card {% if t.isDone %}is-done{% endif %} {% if t.isOverdue %}is-overdue{% endif %} is-subtask">
+                <div class="card-header">
+                  <span class="task-name">{{ t.name }}</span>
+                  {% if t.isDone %}
+                    <span class="completion-label completion-done">Done</span>
+                  {% else %}
+                    <span class="completion-label completion-open">Open</span>
+                  {% endif %}
+                </div>
+                {% if t.assignee and t.assignee != 'Unassigned' %}
+                <div class="card-meta">
+                  <span class="task-assignee">{{ t.assignee }}</span>
+                </div>
+                {% endif %}
+                {% if t.notes %}
+                  <span class="card-notes-icon" title="{{ t.notes }}">📝</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        {# Regular task or subtask whose parent is elsewhere #}
+        {% include "components/task-card.njk" %}
+      {% endif %}
     {% endfor %}
   </div>
 </div>

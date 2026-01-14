@@ -206,6 +206,7 @@ dashana/
 | 7 | Versioning | 2 |
 | 8 | GitHub Actions | 1 |
 | 9 | Polish | 1-2 |
+| 10 | Robustness & Code Quality | 3 |
 
 See individual `PHASE-*.md` files for detailed implementation plans.
 

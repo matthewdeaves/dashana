@@ -7,3 +7,5 @@ Task ID,Created At,Completed At,Last Modified,Name,Section/Column,Assignee,Assig
 6,2026-01-01,,2026-01-01,Task Six,Done,,,,,,,Test Project,,,,,,,
 7,2026-01-01,,2026-01-01,Task Seven,To do,,,,,Planning,Planning phase,Test Project,Task One,,,,,Sprint 2,1
 8,2026-01-01,,2026-01-01,Task Eight,Completed,Alice,alice@test.com,,,,Final review pending,Test Project,,,,Medium,,,
+9,2026-01-01,,2026-01-01,Subtask A,,,,,,,Subtask without section,Test Project,Task Two,,,,,Sprint 1,
+10,2026-01-01,,2026-01-01,Subtask B,,,,,,,Another subtask,Test Project,Task Two,,,,,,

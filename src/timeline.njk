@@ -32,6 +32,7 @@ permalink: /timeline/
           <th class="col-status">Status</th>
           <th class="col-tags">Tags</th>
           <th class="col-parent">Parent</th>
+          <th class="col-notes">Notes</th>
           {% for fieldName in tasks.customFieldNames %}
           <th class="col-custom">{{ fieldName }}</th>
           {% endfor %}
@@ -39,8 +40,8 @@ permalink: /timeline/
       </thead>
       <tbody>
         {% for task in tasks.timeline %}
-        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %}">
-          <td class="col-name" {% if task.notes %}title="{{ task.notes }}"{% endif %}>{{ task.name }}{% if task.notes %} 📝{% endif %}</td>
+        <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %} {% if task.isSubtask %}row-subtask{% endif %}">
+          <td class="col-name">{% if task.isSubtask %}<span class="subtask-indent">↳</span> {% endif %}{{ task.name }}</td>
           <td class="col-completion">
             {% if task.isDone %}
               <span class="completion-label completion-done">Done</span>
@@ -85,6 +86,13 @@ permalink: /timeline/
           <td class="col-parent">
             {% if task.parentTask %}
               <span class="parent-ref">{{ task.parentTask }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td class="col-notes">
+            {% if task.notes %}
+              <span class="notes-icon" title="{{ task.notes }}">📝</span>
             {% else %}
               —
             {% endif %}

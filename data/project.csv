@@ -1,21 +1,160 @@
-﻿Task ID,Created At,Completed At,Last Modified,Name,Section/Column,Assignee,Assignee Email,Start Date,Due Date,Tags,Notes,Projects,Parent task,Blocked By (Dependencies),Blocking (Dependencies),Priority,Status
-"1212777918659209",2026-01-13,,2026-01-13,Draft project brief,To do,Matt Deaves,matt@matthewdeaves.com,2026-01-13,2026-01-15,,,Cross-functional project plan,,,,Low,On track
-"1212777918659211",2026-01-13,,2026-01-13,Schedule kickoff meeting,To do,Matt Deaves,matt@matthewdeaves.com,2026-01-14,2026-01-16,,,Cross-functional project plan,,,,Medium,At risk
-"1212777917850889",2026-01-13,,2026-01-13,Share timeline with teammates,To do,,,2026-01-15,2026-01-19,,,Cross-functional project plan,,,,High,Off track
-"1212777917850925",2026-01-13,,2026-01-13,thing to do one,To do,,,,,,,Cross-functional project plan,,,,,At risk
-"1212777917850927",2026-01-13,,2026-01-13,thing to do 2,To do,,,,,,,Cross-functional project plan,,,,,
-"1212777917850905",2026-01-13,,2026-01-13,Doing things one,Doing,,,,2026-01-28,,,Cross-functional project plan,,,,Medium,On track
-"1212777917850931",2026-01-13,,2026-01-13,doing thing 1,Doing,,,,2026-01-21,,,Cross-functional project plan,,,,,On track
-"1212777917850933",2026-01-13,,2026-01-13,doing thing 2,Doing,,,,2026-01-14,,,Cross-functional project plan,,,,,
-"1212777917850935",2026-01-13,,2026-01-13,doing thing 3,Doing,,,,,,,Cross-functional project plan,,,,,
-"1212777917850937",2026-01-13,,2026-01-13,doing thing 4,Doing,,,,2026-01-29,,,Cross-functional project plan,,,,Medium,On track
-"1212777917850909",2026-01-13,,2026-01-13,testing thing 1,Testing,Matt Deaves,matt@matthewdeaves.com,,,,,Cross-functional project plan,,,,,
-"1212777917850911",2026-01-13,,2026-01-13,testing thing 2,Testing,,,,,,,Cross-functional project plan,,,,,On track
-"1212777917850913",2026-01-13,,2026-01-13,testing thing four,Testing,,,,,,,Cross-functional project plan,,,,High,
-"1212777917850915",2026-01-13,,2026-01-13,testing thing 5,Testing,,,,,,,Cross-functional project plan,,,,,
-"1212777917850939",2026-01-13,,2026-01-13,reviewing thing one,Reviewing,,,,,,,Cross-functional project plan,,,,,
-"1212777917850941",2026-01-13,,2026-01-13,reviewing thing two,Reviewing,Matt Deaves,matt@matthewdeaves.com,,,,,Cross-functional project plan,,,,Medium,
-"1212777917850943",2026-01-13,,2026-01-13,reviewing thing three,Reviewing,,,,,,,Cross-functional project plan,,,,,On track
-"1212777917850917",2026-01-13,,2026-01-13,done thing one,Done,,,,,,,Cross-functional project plan,,,,,
-"1212777917850919",2026-01-13,,2026-01-13,done thing 2,Done,,,,,,,Cross-functional project plan,,,,High,
-"1212777917850921",2026-01-13,,2026-01-13,done thing 3,Done,,,,,,,Cross-functional project plan,,,,,
+Task ID,Created At,Completed At,Last Modified,Name,Section/Column,Assignee,Assignee Email,Start Date,Due Date,Tags,Notes,Projects,Parent task,Blocked By (Dependencies),Blocking (Dependencies),Priority,Status,Team
+"1001000000000001",2025-12-01,,2026-01-14,Define product vision and success metrics,Backlog,Sarah Chen,sarah.chen@example.com,2025-12-01,2025-12-15,"planning,strategy","This is a critical foundational task that will guide all subsequent work on the mobile app redesign. We need to clearly articulate what success looks like for this project, including key performance indicators (KPIs) such as user engagement rates, conversion metrics, and customer satisfaction scores.
+
+The vision document should cover:
+1. Target user personas and their pain points
+2. Competitive analysis summary
+3. Feature prioritization framework
+4. Success metrics with specific targets
+5. Timeline milestones
+
+Stakeholders to consult: Product team, Engineering leads, Customer Success, Marketing",Mobile App Redesign,,,,High,On track,Product
+"1001000000000002",2025-12-01,,2026-01-10,Conduct user research interviews,Backlog,Emily Rodriguez,emily.rodriguez@example.com,2025-12-05,2025-12-20,"research,ux","Schedule and conduct 15-20 user interviews across different segments:
+- Power users (5-6 interviews)
+- Casual users (5-6 interviews)
+- Churned users (3-4 interviews)
+- Prospective users (3-4 interviews)
+
+Each interview should follow the discussion guide and be recorded for later analysis. Key themes to explore include navigation difficulties, feature discoverability, and mobile-specific pain points.",Mobile App Redesign,,,,High,At risk,Design
+"1001000000000003",2025-12-02,,2026-01-14,Create wireframes for new navigation,To do,Marcus Thompson,marcus.thompson@example.com,2026-01-10,2026-01-25,"design,ux,navigation","Based on user research findings, design new navigation patterns that address the top 5 usability issues identified. Consider both bottom navigation and hamburger menu patterns. Must support accessibility requirements (WCAG 2.1 AA).",Mobile App Redesign,,,Define product vision and success metrics,High,On track,Design
+"1001000000000004",2025-12-02,,2026-01-12,Set up CI/CD pipeline for mobile builds,To do,James Wilson,james.wilson@example.com,2026-01-08,2026-01-20,"devops,infrastructure","Configure automated build and deployment pipeline:
+- iOS builds via Xcode Cloud or Fastlane
+- Android builds via Gradle
+- Automated testing on each PR
+- Beta distribution via TestFlight/Firebase App Distribution
+- Code signing and certificate management",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000005",2025-12-03,,2026-01-14,Design new onboarding flow,To do,Emily Rodriguez,emily.rodriguez@example.com,2026-01-15,2026-01-30,"design,onboarding,ux","Create a streamlined onboarding experience that reduces time-to-value. Current onboarding has a 40% drop-off rate - target is to reduce this to under 20%. Include progressive disclosure and skip options for experienced users.",Mobile App Redesign,,,,High,At risk,Design
+"1001000000000006",2025-12-03,,2026-01-08,Audit current codebase for technical debt,To do,David Kim,david.kim@example.com,2026-01-05,2026-01-15,"technical-debt,audit",,Mobile App Redesign,,,,Medium,Off track,Engineering
+"1001000000000007",2025-12-04,,2026-01-14,Implement dark mode support,To do,Lisa Park,lisa.park@example.com,2026-01-20,2026-02-05,"feature,accessibility,ui","Add system-level dark mode support with manual override option. Ensure all color tokens are properly themed and test on various devices. This is a frequently requested feature with over 500 user requests in the feedback system.",Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000008",2025-12-04,,2026-01-14,Create component library documentation,To do,Marcus Thompson,marcus.thompson@example.com,2026-01-12,2026-01-28,"documentation,design-system",,Mobile App Redesign,,,,Low,,Design
+"1001000000000009",2025-12-05,,2026-01-14,Refactor authentication module,Doing,James Wilson,james.wilson@example.com,2026-01-02,2026-01-18,"security,refactor","The current auth module is tightly coupled and difficult to test. Refactor to use dependency injection and add support for biometric authentication (Face ID, Touch ID, fingerprint). Security audit required before deployment.",Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000010",2025-12-05,,2026-01-14,Build new dashboard widgets,Doing,David Kim,david.kim@example.com,2026-01-05,2026-01-22,"feature,dashboard","Implement the 6 new dashboard widgets as specified in the design mockups:
+1. Activity summary chart
+2. Quick actions panel
+3. Recent items carousel
+4. Progress tracker
+5. Notification center preview
+6. Personalized recommendations
+
+Each widget should be independently testable and support skeleton loading states.",Mobile App Redesign,,,Create wireframes for new navigation,Medium,On track,Engineering
+"1001000000000011",2025-12-06,,2026-01-13,Implement offline mode,Doing,Lisa Park,lisa.park@example.com,2026-01-08,2026-02-01,"feature,offline,sync","Add offline support using local SQLite database with background sync. Handle conflict resolution for data modified offline. This is essential for users with intermittent connectivity.",Mobile App Redesign,,,,High,At risk,Engineering
+"1001000000000012",2025-12-06,,2026-01-14,Design system color palette update,Doing,Emily Rodriguez,emily.rodriguez@example.com,2026-01-10,2026-01-17,"design,design-system,accessibility","Update color palette to meet WCAG 2.1 AA contrast requirements. Current palette fails contrast checks on 12 color combinations. New palette should support both light and dark modes.",Mobile App Redesign,,,,Medium,On track,Design
+"1001000000000013",2025-12-07,,2026-01-11,Performance optimization - image loading,Doing,Alex Turner,alex.turner@example.com,2026-01-06,2026-01-14,"performance,optimization","Implement lazy loading, progressive image loading, and WebP format support. Target: reduce initial load time by 40% and cut data usage by 30%. Current baseline measurements documented in the performance dashboard.",Mobile App Redesign,,,,High,Off track,Engineering
+"1001000000000014",2025-12-07,,2026-01-14,Write unit tests for cart module,Doing,Rachel Green,rachel.green@example.com,2026-01-08,2026-01-19,"testing,quality",,Mobile App Redesign,,,,Medium,,QA
+"1001000000000015",2025-12-08,,2026-01-14,API versioning strategy,Testing,James Wilson,james.wilson@example.com,2025-12-20,2026-01-10,"api,architecture","Implement API versioning to support gradual rollout of new endpoints while maintaining backward compatibility. Use URL path versioning (v1, v2) with deprecation headers for old endpoints.",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000016",2025-12-08,,2026-01-12,Push notification improvements,Testing,David Kim,david.kim@example.com,2026-01-03,2026-01-15,"feature,notifications","Enhance push notifications with rich media support, action buttons, and improved targeting. Add user preference controls for notification categories. Test across iOS and Android platforms.",Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000017",2025-12-09,,2026-01-14,Accessibility audit and fixes,Testing,Sarah Chen,sarah.chen@example.com,2026-01-05,2026-01-18,"accessibility,compliance,audit","Complete accessibility audit using Axe, VoiceOver, and TalkBack. Document all issues and implement fixes for P0 and P1 items. Ensure screen reader compatibility and keyboard navigation support.",Mobile App Redesign,,,,High,At risk,QA
+"1001000000000018",2025-12-09,,2026-01-09,Integration testing - payment flow,Testing,Rachel Green,rachel.green@example.com,2026-01-02,2026-01-12,"testing,payments,integration",,Mobile App Redesign,,,,High,On track,QA
+"1001000000000019",2025-12-10,,2026-01-14,Search functionality redesign,Testing,Marcus Thompson,marcus.thompson@example.com,2025-12-28,2026-01-14,"feature,search,ux","New search implementation with:
+- Autocomplete suggestions
+- Recent searches
+- Voice search support
+- Filter chips
+- Search results with highlighted terms
+
+Testing focus: response time (<200ms), relevance ranking, and handling of edge cases (special characters, very long queries, empty results).",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000020",2025-12-10,,2026-01-14,User settings page redesign,Reviewing,Emily Rodriguez,emily.rodriguez@example.com,2025-12-15,2026-01-08,"design,settings,ux","Reorganized settings page with improved information architecture. Grouped related settings, added search within settings, and improved labels based on user feedback.",Mobile App Redesign,,,,Low,On track,Design
+"1001000000000021",2025-12-11,,2026-01-14,Error handling standardization,Reviewing,Lisa Park,lisa.park@example.com,2025-12-20,2026-01-05,"quality,error-handling","Standardize error messages and handling across the app. Create consistent error UI components with actionable messages. Implement proper error logging and crash reporting integration.",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000022",2025-12-11,,2026-01-10,Analytics event tracking update,Reviewing,Alex Turner,alex.turner@example.com,2025-12-22,2026-01-07,"analytics,tracking",,Mobile App Redesign,,,,Low,,Engineering
+"1001000000000023",2025-12-12,,2026-01-14,Memory leak fixes,Reviewing,David Kim,david.kim@example.com,2025-12-18,2025-12-30,"bug,performance,critical","Fixed 3 memory leaks identified in the performance audit:
+1. Image cache not clearing on low memory warning
+2. Event listeners not removed on view controller dealloc
+3. Circular reference in notification observers
+
+All fixes validated with Instruments profiling.",Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000024",2025-12-12,,2026-01-08,Localization for 5 new languages,Reviewing,Sarah Chen,sarah.chen@example.com,2025-12-10,2025-12-28,"localization,i18n","Added support for: Japanese, Korean, Portuguese (BR), Polish, and Turkish. All strings reviewed by native speakers. RTL support verified for future Arabic/Hebrew additions.",Mobile App Redesign,,,,Medium,On track,Product
+"1001000000000025",2025-12-13,2025-12-28,2025-12-28,Set up crash reporting,Done,James Wilson,james.wilson@example.com,2025-12-13,2025-12-20,"infrastructure,monitoring","Implemented Crashlytics for iOS and Android with custom keys for debugging. Set up alerts for crash rate thresholds. Dashboard configured for the team.",Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000026",2025-12-13,2025-12-30,2025-12-30,Define API contracts,Done,Alex Turner,alex.turner@example.com,2025-12-13,2025-12-25,"api,documentation","OpenAPI 3.0 specification completed for all 47 endpoints. Includes request/response schemas, authentication requirements, and example payloads. Published to internal API portal.",Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000027",2025-12-14,2026-01-05,2026-01-05,Create design mockups - home screen,Done,Marcus Thompson,marcus.thompson@example.com,2025-12-14,2025-12-28,"design,mockups",,Mobile App Redesign,,,,High,On track,Design
+"1001000000000028",2025-12-14,2026-01-02,2026-01-02,Database migration script,Done,Lisa Park,lisa.park@example.com,2025-12-14,2025-12-22,"database,migration","Migration script for schema changes supporting new features. Includes rollback capability and data validation. Tested on staging with production data copy.",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000029",2025-12-15,2026-01-08,2026-01-08,Security penetration testing,Done,Rachel Green,rachel.green@example.com,2025-12-15,2026-01-05,"security,testing,audit","Third-party penetration test completed. 2 medium and 5 low severity issues identified and remediated. Final report approved by security team.",Mobile App Redesign,,,,High,On track,QA
+"1001000000000030",2025-12-15,2025-12-22,2025-12-22,Initial project setup,Done,James Wilson,james.wilson@example.com,2025-12-01,2025-12-10,"setup,infrastructure",,Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000031",2025-12-16,2026-01-03,2026-01-03,Competitor analysis report,Done,Sarah Chen,sarah.chen@example.com,2025-12-05,2025-12-20,"research,analysis","Comprehensive analysis of 8 competitor apps covering: feature comparison, UX patterns, pricing models, and user reviews analysis. Key insights incorporated into product roadmap.",Mobile App Redesign,,,,Medium,On track,Product
+"1001000000000032",2025-12-16,2025-12-29,2025-12-29,Code review guidelines,Done,David Kim,david.kim@example.com,2025-12-10,2025-12-18,"process,documentation",,Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000033",2025-12-17,,2026-01-14,Button component - implement variants,To do,Lisa Park,lisa.park@example.com,2026-01-18,2026-01-22,"design-system,components",Create primary secondary and tertiary button variants with loading and disabled states.,Mobile App Redesign,Create component library documentation,,,Low,On track,Engineering
+"1001000000000034",2025-12-17,,2026-01-14,Input field component - validation states,To do,Lisa Park,lisa.park@example.com,2026-01-22,2026-01-26,"design-system,components",,Mobile App Redesign,Create component library documentation,,,Low,,Engineering
+"1001000000000035",2025-12-18,,2026-01-14,Modal component - animations,To do,David Kim,david.kim@example.com,2026-01-26,2026-01-30,"design-system,components,animation",,Mobile App Redesign,Create component library documentation,,,Low,On track,Engineering
+"1001000000000036",2025-12-18,,2026-01-14,Toast notification component,Doing,Alex Turner,alex.turner@example.com,2026-01-10,2026-01-16,"design-system,components","Implement toast notifications with auto-dismiss, action buttons, and queue management for multiple simultaneous toasts.",Mobile App Redesign,Create component library documentation,,,Medium,On track,Engineering
+"1001000000000037",2025-12-19,,2026-01-14,Write E2E tests - login flow,To do,Rachel Green,rachel.green@example.com,2026-01-20,2026-01-28,"testing,e2e,automation","Automated end-to-end tests for:
+- Email/password login
+- Social login (Google, Apple, Facebook)
+- Forgot password flow
+- Session persistence
+- Logout",Mobile App Redesign,,,Refactor authentication module,High,On track,QA
+"1001000000000038",2025-12-19,,2026-01-14,Write E2E tests - checkout flow,To do,Rachel Green,rachel.green@example.com,2026-01-28,2026-02-05,"testing,e2e,automation",,Mobile App Redesign,,,Integration testing - payment flow,High,,QA
+"1001000000000039",2025-12-20,,2026-01-14,Performance baseline documentation,Reviewing,Alex Turner,alex.turner@example.com,2026-01-02,2026-01-10,"documentation,performance","Document current performance metrics as baseline:
+- App launch time: 2.3s (cold), 0.8s (warm)
+- Memory footprint: 145MB average
+- Battery drain: 4%/hour active use
+- Network: 2.1MB average session",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000040",2025-12-20,,2026-01-14,Stakeholder demo preparation,To do,Sarah Chen,sarah.chen@example.com,2026-01-25,2026-01-30,"demo,communication",,Mobile App Redesign,,,,Medium,On track,Product
+"1001000000000041",2025-12-21,,2026-01-14,Beta testing recruitment,To do,Emily Rodriguez,emily.rodriguez@example.com,2026-01-28,2026-02-10,"testing,beta,users","Recruit 200 beta testers across segments:
+- 50 power users
+- 100 regular users
+- 50 new users
+
+Set up feedback collection via in-app surveys and dedicated Slack channel.",Mobile App Redesign,,,,Medium,On track,Design
+"1001000000000042",2025-12-21,,2026-01-14,App store listing update,Backlog,Sarah Chen,sarah.chen@example.com,2026-02-01,2026-02-15,"marketing,app-store","Update App Store and Play Store listings with new screenshots, feature descriptions, and promotional text. Coordinate with marketing for launch timing.",Mobile App Redesign,,,,Low,On track,Product
+"1001000000000043",2025-12-22,,2026-01-14,Implement haptic feedback,Backlog,David Kim,david.kim@example.com,,,feature,"Add haptic feedback for key interactions: button taps, pull-to-refresh, successful actions. Should be subtle and follow platform conventions. Include user preference toggle.",Mobile App Redesign,,,,Low,,Engineering
+"1001000000000044",2025-12-22,,2026-01-14,Animation performance audit,Backlog,Alex Turner,alex.turner@example.com,,,"performance,animation",,Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000045",2025-12-23,,2026-01-12,Fix: Profile image upload crash,To do,James Wilson,james.wilson@example.com,2026-01-10,2026-01-12,"bug,critical,crash","Users experiencing crashes when uploading profile images larger than 5MB. Need to implement image compression before upload and add proper error handling for memory pressure situations.
+
+Crash logs: https://crashlytics.example.com/issue/12345
+
+Affected versions: 3.2.0+
+Affected devices: Primarily older devices with <3GB RAM",Mobile App Redesign,,,,High,Off track,Engineering
+"1001000000000046",2025-12-23,,2026-01-14,Fix: Cart total calculation error,Doing,Lisa Park,lisa.park@example.com,2026-01-08,2026-01-14,"bug,high-priority","Rounding errors in cart total when applying percentage discounts. Need to implement proper decimal handling using BigDecimal or similar.",Mobile App Redesign,,,,High,At risk,Engineering
+"1001000000000047",2025-12-24,,2026-01-14,Fix: Deep link handling on cold start,Testing,David Kim,david.kim@example.com,2026-01-05,2026-01-12,"bug,deep-links",,Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000048",2025-12-24,,2026-01-14,Fix: Keyboard covering input fields,Done,Marcus Thompson,marcus.thompson@example.com,2025-12-24,2025-12-30,"bug,ux",,Mobile App Redesign,,,,Medium,On track,Design
+"1001000000000049",2025-12-25,,2026-01-14,Research: AR feature feasibility,Backlog,Emily Rodriguez,emily.rodriguez@example.com,,,"research,ar,future","Investigate feasibility of AR try-on feature for product visualization. Evaluate ARKit/ARCore capabilities, development effort, and potential user value. This is exploratory for potential future roadmap inclusion.",Mobile App Redesign,,,,Low,,Design
+"1001000000000050",2025-12-25,,2026-01-14,Research: Voice command integration,Backlog,Alex Turner,alex.turner@example.com,,,"research,voice,accessibility",,Mobile App Redesign,,,,Low,,Engineering
+"1001000000000051",2025-12-26,,2026-01-14,Documentation: API integration guide,To do,James Wilson,james.wilson@example.com,2026-01-20,2026-02-01,"documentation,api","Write comprehensive API integration guide for third-party developers. Include authentication, rate limits, webhooks, and code samples in multiple languages.",Mobile App Redesign,,,Define API contracts,Medium,On track,Engineering
+"1001000000000052",2025-12-26,,2026-01-14,Documentation: Release notes template,Done,Sarah Chen,sarah.chen@example.com,2025-12-26,2025-12-28,"documentation,process",,Mobile App Redesign,,,,Low,On track,Product
+"1001000000000053",2025-12-27,,2026-01-14,Implement feature flags system,Doing,Alex Turner,alex.turner@example.com,2026-01-06,2026-01-18,"infrastructure,feature-flags","Set up LaunchDarkly or similar for feature flag management. This enables:
+- Gradual rollouts
+- A/B testing
+- Kill switches for problematic features
+- Environment-specific configurations",Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000054",2025-12-27,,2026-01-14,Set up A/B testing framework,To do,David Kim,david.kim@example.com,2026-01-18,2026-01-30,"infrastructure,testing,analytics",,Mobile App Redesign,,,Implement feature flags system,Medium,On track,Engineering
+"1001000000000055",2025-12-28,,2026-01-14,Load testing - API endpoints,Testing,Rachel Green,rachel.green@example.com,2026-01-10,2026-01-17,"testing,performance,api","Load test all critical API endpoints:
+- Target: 10,000 concurrent users
+- Response time P99 < 500ms
+- Error rate < 0.1%
+
+Document results and identify bottlenecks.",Mobile App Redesign,,,,High,On track,QA
+"1001000000000056",2025-12-28,,2026-01-14,Update privacy policy for new features,Backlog,Sarah Chen,sarah.chen@example.com,2026-02-01,2026-02-10,"legal,compliance,privacy",,Mobile App Redesign,,,,Medium,,Product
+"1001000000000057",2025-12-29,,2026-01-14,Implement biometric authentication,Doing,James Wilson,james.wilson@example.com,2026-01-10,2026-01-22,"feature,security,authentication","Add Face ID/Touch ID support for iOS and fingerprint/face unlock for Android. Store auth tokens securely in Keychain/Keystore. Provide fallback to PIN/password.",Mobile App Redesign,,,Refactor authentication module,High,On track,Engineering
+"1001000000000058",2025-12-29,,2026-01-14,Rate limiting implementation,Testing,Lisa Park,lisa.park@example.com,2026-01-05,2026-01-14,"security,api,infrastructure",,Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000059",2025-12-30,,2026-01-14,Gradient background performance,Backlog,Marcus Thompson,marcus.thompson@example.com,,,"performance,ui","Investigate and optimize gradient background rendering. Currently causing frame drops on older devices. Consider using cached rendered images or simpler alternatives.",Mobile App Redesign,,,,Low,At risk,Design
+"1001000000000060",2025-12-30,,2026-01-14,Data export functionality,To do,Alex Turner,alex.turner@example.com,2026-01-25,2026-02-08,"feature,gdpr,compliance","Implement user data export feature for GDPR compliance. Users should be able to request and download all their data in machine-readable format (JSON). Include audit logging of all exports.",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000061",2025-12-31,2026-01-10,2026-01-10,SSL certificate renewal,Done,David Kim,david.kim@example.com,2025-12-31,2026-01-05,"infrastructure,security",,Mobile App Redesign,,,,High,On track,Engineering
+"1001000000000062",2025-12-31,,2026-01-14,Implement pull-to-refresh,Done,Lisa Park,lisa.park@example.com,2025-12-20,2025-12-28,"feature,ux",,Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000063",2026-01-01,,2026-01-14,Review third-party SDK licenses,Backlog,Sarah Chen,sarah.chen@example.com,,,"legal,compliance,audit","Audit all third-party SDKs for license compliance. Ensure attribution requirements are met. Flag any SDKs with GPL or other restrictive licenses for legal review.",Mobile App Redesign,,,,Medium,On track,Product
+"1001000000000064",2026-01-01,,2026-01-14,Session timeout handling,Doing,James Wilson,james.wilson@example.com,2026-01-08,2026-01-15,"security,ux","Implement graceful session timeout handling:
+- Show warning 5 min before expiry
+- Allow session extension
+- Save draft state before logout
+- Smooth re-authentication flow",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000065",2026-01-02,,2026-01-14,Skeleton loading screens,Testing,Marcus Thompson,marcus.thompson@example.com,2025-12-28,2026-01-08,"ux,design,loading","Replace spinner loaders with skeleton screens throughout the app. Provides better perceived performance and matches modern app patterns.",Mobile App Redesign,,,,Low,On track,Design
+"1001000000000066",2026-01-02,,2026-01-14,Empty state illustrations,Reviewing,Emily Rodriguez,emily.rodriguez@example.com,2025-12-22,2026-01-05,"design,ux,illustrations","Create friendly empty state illustrations for:
+- Empty cart
+- No search results
+- No notifications
+- Empty favorites list
+- First-time user states",Mobile App Redesign,,,,Low,On track,Design
+"1001000000000067",2026-01-03,,2026-01-14,SUBTASK: iOS biometric setup,Doing,James Wilson,james.wilson@example.com,2026-01-10,2026-01-15,ios,,Mobile App Redesign,Implement biometric authentication,,,High,On track,Engineering
+"1001000000000068",2026-01-03,,2026-01-14,SUBTASK: Android biometric setup,To do,David Kim,david.kim@example.com,2026-01-15,2026-01-20,android,,Mobile App Redesign,Implement biometric authentication,,,High,,Engineering
+"1001000000000069",2026-01-03,,2026-01-14,SUBTASK: Biometric UI components,To do,Marcus Thompson,marcus.thompson@example.com,2026-01-12,2026-01-18,"design,ui",,Mobile App Redesign,Implement biometric authentication,,,Medium,On track,Design
+"1001000000000070",2026-01-04,,2026-01-14,Weekly status report automation,Done,Sarah Chen,sarah.chen@example.com,2025-12-15,2025-12-22,"process,automation",,Mobile App Redesign,,,,Low,On track,Product
+"1001000000000071",2026-01-04,,2026-01-14,Optimize bundle size,To do,Alex Turner,alex.turner@example.com,2026-01-20,2026-02-01,"performance,build,optimization","Reduce app bundle size by 20%:
+- Remove unused dependencies
+- Implement tree shaking
+- Compress assets
+- Use dynamic imports for large features
+
+Current size: 45MB (iOS), 38MB (Android)
+Target: <36MB (iOS), <30MB (Android)",Mobile App Redesign,,,,Medium,On track,Engineering
+"1001000000000072",2026-01-05,,2026-01-14,Implement app rating prompt,Backlog,Lisa Park,lisa.park@example.com,2026-02-10,2026-02-20,"feature,engagement","Add smart app rating prompt that triggers after positive interactions. Follow Apple and Google guidelines for prompt timing. Track prompt impressions and conversion rates.",Mobile App Redesign,,,,Low,On track,Engineering
+"1001000000000073",2026-01-05,,2026-01-14,Fix: Notification badge count sync,To do,David Kim,david.kim@example.com,2026-01-15,2026-01-18,"bug,notifications","Badge count on app icon not syncing correctly with actual unread notifications. Need to implement proper badge management with server sync.",Mobile App Redesign,,,,Medium,At risk,Engineering
+"1001000000000074",2026-01-06,,2026-01-14,Design review - dashboard iteration 2,Reviewing,Emily Rodriguez,emily.rodriguez@example.com,2026-01-06,2026-01-10,"design,review","Second iteration of dashboard design incorporating feedback from stakeholder review. Key changes: simplified metrics display, more prominent quick actions, improved visual hierarchy.",Mobile App Redesign,,,Create design mockups - home screen,High,On track,Design
+"1001000000000075",2026-01-06,,2026-01-14,Implement widget customization,Backlog,Marcus Thompson,marcus.thompson@example.com,,,"feature,customization,ux","Allow users to customize dashboard by adding, removing, and reordering widgets. Save preferences to user profile for cross-device sync.",Mobile App Redesign,,,Build new dashboard widgets,Low,,Design

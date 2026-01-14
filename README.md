@@ -2,6 +2,8 @@
 
 Share project status with customers who don't have access to your Asana instance. Export your Asana project to CSV, push to this template repo, and get a configurable status report published to GitHub Pages.
 
+**[Live Demo](https://matthewdeaves.github.io/dashana/)**
+
 ## Quick Start
 
 1. **Click "Use this template"** on GitHub to create your repo

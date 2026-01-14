@@ -64,10 +64,70 @@ git push && git tag v$(date +%Y-%m-%d) && git push --tags
 
 ## Configuration
 
-Edit `dashana.config`:
+Edit `dashana.config` to customise your report. All options use `YES`/`NO` values (defaults to `YES` if omitted).
+
+### Core Settings
+
+```ini
+PROJECT_NAME=My Project      # Report title
+CUSTOMER_NAME=Acme Corp      # Shown in header
+SITE_BASE=                   # Optional: for custom domain paths (auto-detected on GitHub Pages)
 ```
-PROJECT_NAME=My Project
-CUSTOMER_NAME=Acme Corp
+
+### Tab Visibility
+
+Hide views you don't need:
+
+```ini
+SHOW_DASHBOARD=YES
+SHOW_BOARD=YES
+SHOW_TASKS=YES
+SHOW_TIMELINE=YES
+```
+
+### Tasks Table Columns
+
+```ini
+TASKS_COL_NAME=YES
+TASKS_COL_PROGRESS=YES
+TASKS_COL_SECTION=YES
+TASKS_COL_ASSIGNEE=YES
+TASKS_COL_DUE=YES
+TASKS_COL_PRIORITY=YES
+TASKS_COL_STATUS=YES
+TASKS_COL_TAGS=YES
+TASKS_COL_PARENT=YES
+TASKS_COL_NOTES=YES
+TASKS_COL_CUSTOM=YES
+```
+
+### Timeline Columns
+
+```ini
+TIMELINE_COL_NAME=YES
+TIMELINE_COL_PROGRESS=YES
+TIMELINE_COL_SECTION=YES
+TIMELINE_COL_START=YES
+TIMELINE_COL_DUE=YES
+TIMELINE_COL_DURATION=YES
+TIMELINE_COL_STATUS=YES
+TIMELINE_COL_TAGS=YES
+TIMELINE_COL_PARENT=YES
+TIMELINE_COL_CUSTOM=YES
+```
+
+### Board Card Items
+
+```ini
+CARD_SHOW_PROGRESS=YES
+CARD_SHOW_ASSIGNEE=YES
+CARD_SHOW_DUE=YES
+CARD_SHOW_STATUS=YES
+CARD_SHOW_PRIORITY=YES
+CARD_SHOW_TAGS=YES
+CARD_SHOW_PARENT=YES
+CARD_SHOW_NOTES=YES
+CARD_SHOW_CUSTOM=YES
 ```
 
 ## Views

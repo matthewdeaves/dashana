@@ -1,33 +1,52 @@
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('csv-parse/sync');
+const fs = require("fs");
+const path = require("path");
+const { parse } = require("csv-parse/sync");
 
 // Standard Asana CSV fields - anything else is a custom field
 const KNOWN_FIELDS = [
-  'Task ID', 'Name', 'Section/Column',
-  'Assignee', 'Assignee Email',
-  'Start Date', 'Due Date',
-  'Priority', 'Status', 'Notes',
-  'Created At', 'Completed At', 'Last Modified',
-  'Tags', 'Projects', 'Parent task',
-  'Blocked By (Dependencies)', 'Blocking (Dependencies)'
+  "Task ID",
+  "Name",
+  "Section/Column",
+  "Assignee",
+  "Assignee Email",
+  "Start Date",
+  "Due Date",
+  "Priority",
+  "Status",
+  "Notes",
+  "Created At",
+  "Completed At",
+  "Last Modified",
+  "Tags",
+  "Projects",
+  "Parent task",
+  "Blocked By (Dependencies)",
+  "Blocking (Dependencies)",
 ];
 
-module.exports = function() {
-  const csvPath = path.join(__dirname, '../../data/project.csv');
+module.exports = function () {
+  const csvPath = path.join(__dirname, "../../data/project.csv");
 
   try {
-    const content = fs.readFileSync(csvPath, 'utf-8');
+    const content = fs.readFileSync(csvPath, "utf-8");
     const records = parse(content, {
       columns: true,
       skip_empty_lines: true,
-      bom: true
+      bom: true,
     });
 
     return processRecords(records);
   } catch (e) {
-    console.warn('data/project.csv not found:', e.message);
-    return { all: [], sections: {}, sectionNames: [], stats: {}, timeline: [], projectRange: { start: null, end: null, days: 0 }, customFieldNames: [] };
+    console.warn("data/project.csv not found:", e.message);
+    return {
+      all: [],
+      sections: {},
+      sectionNames: [],
+      stats: {},
+      timeline: [],
+      projectRange: { start: null, end: null, days: 0 },
+      customFieldNames: [],
+    };
   }
 };
 
@@ -38,30 +57,35 @@ function processRecords(records, today = null) {
   today.setHours(0, 0, 0, 0);
 
   // Collect all custom field names (columns not in KNOWN_FIELDS)
-  const customFieldNames = records.length > 0
-    ? [...new Set(
-        records.flatMap(r => Object.keys(r).filter(k => !KNOWN_FIELDS.includes(k)))
-      )]
-    : [];
+  const customFieldNames =
+    records.length > 0
+      ? [
+          ...new Set(
+            records.flatMap((r) =>
+              Object.keys(r).filter((k) => !KNOWN_FIELDS.includes(k)),
+            ),
+          ),
+        ]
+      : [];
 
   // Build a map of task names to their sections (for subtask inheritance)
   const taskSectionMap = {};
-  records.forEach(record => {
-    if (record['Name'] && record['Section/Column']) {
-      taskSectionMap[record['Name']] = record['Section/Column'];
+  records.forEach((record) => {
+    if (record.Name && record["Section/Column"]) {
+      taskSectionMap[record.Name] = record["Section/Column"];
     }
   });
 
   // Extract unique section names in order of first appearance
   // Subtasks inherit parent's section, skip "Uncategorized" if it only contains subtasks
   const sectionNamesSet = new Set();
-  records.forEach(record => {
-    let section = record['Section/Column'];
+  records.forEach((record) => {
+    let section = record["Section/Column"];
     // If no section but has parent task, inherit parent's section
-    if (!section && record['Parent task']) {
-      section = taskSectionMap[record['Parent task']] || 'Uncategorized';
+    if (!section && record["Parent task"]) {
+      section = taskSectionMap[record["Parent task"]] || "Uncategorized";
     } else if (!section) {
-      section = 'Uncategorized';
+      section = "Uncategorized";
     }
     sectionNamesSet.add(section);
   });
@@ -73,53 +97,56 @@ function processRecords(records, today = null) {
     sectionOrderMap[name] = index + 1;
   });
 
-  const tasks = records.map(record => {
+  const tasks = records.map((record) => {
     // Subtasks inherit parent's section if they don't have one
-    let section = record['Section/Column'];
-    if (!section && record['Parent task']) {
-      section = taskSectionMap[record['Parent task']] || 'Uncategorized';
+    let section = record["Section/Column"];
+    if (!section && record["Parent task"]) {
+      section = taskSectionMap[record["Parent task"]] || "Uncategorized";
     } else if (!section) {
-      section = 'Uncategorized';
+      section = "Uncategorized";
     }
 
     // Extract custom field values for this record
-    const customFields = customFieldNames.length > 0
-      ? Object.fromEntries(
-          customFieldNames.map(name => [name, record[name] || null])
-        )
-      : null;
+    const customFields =
+      customFieldNames.length > 0
+        ? Object.fromEntries(
+            customFieldNames.map((name) => [name, record[name] || null]),
+          )
+        : null;
 
     return {
-      id: record['Task ID'],
-      name: record['Name'],
+      id: record["Task ID"],
+      name: record.Name,
       section: section,
-      assignee: record['Assignee'] || 'Unassigned',
-      assigneeEmail: record['Assignee Email'] || '',
-      startDate: record['Start Date'] || null,
-      dueDate: record['Due Date'] || null,
-      priority: record['Priority'] || null,
-      status: record['Status'] || null,
-      notes: record['Notes'] || '',
-      tags: record['Tags']
-        ? record['Tags'].split(',').map(t => t.trim()).filter(Boolean)
+      assignee: record.Assignee || "Unassigned",
+      assigneeEmail: record["Assignee Email"] || "",
+      startDate: record["Start Date"] || null,
+      dueDate: record["Due Date"] || null,
+      priority: record.Priority || null,
+      status: record.Status || null,
+      notes: record.Notes || "",
+      tags: record.Tags
+        ? record.Tags.split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
         : [],
-      parentTask: record['Parent task'] || null,
-      isSubtask: !!record['Parent task'],
+      parentTask: record["Parent task"] || null,
+      isSubtask: !!record["Parent task"],
       customFields: customFields,
       // Computed
-      isOverdue: isOverdue(record['Due Date'], section, today),
+      isOverdue: isOverdue(record["Due Date"], section, today),
       isDone: isDoneSection(section),
-      daysUntilDue: daysUntil(record['Due Date'], today),
-      priorityOrder: priorityOrder(record['Priority']),
-      sectionOrder: sectionOrderMap[section] || 999
+      daysUntilDue: daysUntil(record["Due Date"], today),
+      priorityOrder: priorityOrder(record.Priority),
+      sectionOrder: sectionOrderMap[section] || 999,
     };
   });
 
   // Sort by section order, then priority, with subtasks grouped after their parent
   // First, build a map of parent task names to their index for grouping
-  const parentTasks = tasks.filter(t => !t.isSubtask);
+  const parentTasks = tasks.filter((t) => !t.isSubtask);
   const subtasksByParent = {};
-  tasks.forEach(t => {
+  tasks.forEach((t) => {
     if (t.isSubtask && t.parentTask) {
       if (!subtasksByParent[t.parentTask]) {
         subtasksByParent[t.parentTask] = [];
@@ -130,41 +157,47 @@ function processRecords(records, today = null) {
 
   // Sort parent tasks by section order, then priority
   parentTasks.sort((a, b) => {
-    if (a.sectionOrder !== b.sectionOrder) return a.sectionOrder - b.sectionOrder;
+    if (a.sectionOrder !== b.sectionOrder)
+      return a.sectionOrder - b.sectionOrder;
     return a.priorityOrder - b.priorityOrder;
   });
 
   // Rebuild tasks array with subtasks immediately after their parent
   const sortedTasks = [];
-  parentTasks.forEach(parent => {
+  parentTasks.forEach((parent) => {
     sortedTasks.push(parent);
     const subtasks = subtasksByParent[parent.name] || [];
-    subtasks.forEach(subtask => sortedTasks.push(subtask));
+    subtasks.forEach((subtask) => sortedTasks.push(subtask));
   });
 
   // Replace tasks array with sorted version
   tasks.length = 0;
-  sortedTasks.forEach(t => tasks.push(t));
+  sortedTasks.forEach((t) => tasks.push(t));
 
   // Group by section dynamically
   const sections = {};
-  sectionNames.forEach(name => {
-    sections[name] = tasks.filter(t => t.section === name);
+  sectionNames.forEach((name) => {
+    sections[name] = tasks.filter((t) => t.section === name);
   });
 
   // For each section, mark subtasks that have their parent in the same section
   // and add subtasks array to parent tasks for easy template rendering
-  Object.keys(sections).forEach(sectionName => {
+  Object.keys(sections).forEach((sectionName) => {
     const sectionTasks = sections[sectionName];
-    const taskNamesInSection = new Set(sectionTasks.map(t => t.name));
+    const taskNamesInSection = new Set(sectionTasks.map((t) => t.name));
 
-    sectionTasks.forEach(task => {
+    sectionTasks.forEach((task) => {
       // Check if this is a subtask with parent in same section
-      task.parentInSameSection = task.isSubtask && task.parentTask && taskNamesInSection.has(task.parentTask);
+      task.parentInSameSection =
+        task.isSubtask &&
+        task.parentTask &&
+        taskNamesInSection.has(task.parentTask);
 
       // For parent tasks, collect their subtasks that are in same section
       if (!task.isSubtask) {
-        task.subtasksInSection = sectionTasks.filter(t => t.parentTask === task.name);
+        task.subtasksInSection = sectionTasks.filter(
+          (t) => t.parentTask === task.name,
+        );
         task.hasSubtasksInSection = task.subtasksInSection.length > 0;
       }
     });
@@ -174,11 +207,11 @@ function processRecords(records, today = null) {
   const stats = calculateStats(tasks, sections, sectionNames);
 
   // Calculate project date range for timeline
-  const tasksWithDates = tasks.filter(t => t.startDate || t.dueDate);
+  const tasksWithDates = tasks.filter((t) => t.startDate || t.dueDate);
   let projectStart = null;
   let projectEnd = null;
 
-  tasksWithDates.forEach(t => {
+  tasksWithDates.forEach((t) => {
     const start = t.startDate ? new Date(t.startDate) : null;
     const end = t.dueDate ? new Date(t.dueDate) : null;
 
@@ -188,28 +221,40 @@ function processRecords(records, today = null) {
     if (start && (!projectEnd || start > projectEnd)) projectEnd = start;
   });
 
-  const projectSpan = projectStart && projectEnd
-    ? Math.max(1, Math.ceil((projectEnd - projectStart) / (1000 * 60 * 60 * 24)) + 1)
-    : 30; // default 30 days
+  const projectSpan =
+    projectStart && projectEnd
+      ? Math.max(
+          1,
+          Math.ceil((projectEnd - projectStart) / (1000 * 60 * 60 * 24)) + 1,
+        )
+      : 30; // default 30 days
 
   // Add timeline position to each task
-  tasks.forEach(task => {
+  tasks.forEach((task) => {
     if (task.startDate || task.dueDate) {
-      const start = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
+      const start = task.startDate
+        ? new Date(task.startDate)
+        : new Date(task.dueDate);
       const end = task.dueDate ? new Date(task.dueDate) : start;
 
       const startOffset = projectStart
         ? Math.ceil((start - projectStart) / (1000 * 60 * 60 * 24))
         : 0;
-      const duration = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
+      const duration = Math.max(
+        1,
+        Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1,
+      );
 
-      const startPercent = Math.max(0, Math.min(100, (startOffset / projectSpan) * 100));
+      const startPercent = Math.max(
+        0,
+        Math.min(100, (startOffset / projectSpan) * 100),
+      );
       const rawWidth = (duration / projectSpan) * 100;
       const widthPercent = Math.max(1, Math.min(rawWidth, 100 - startPercent));
 
       task.timeline = {
         startPercent,
-        widthPercent
+        widthPercent,
       };
     } else {
       task.timeline = null;
@@ -218,7 +263,7 @@ function processRecords(records, today = null) {
 
   // Sort for timeline view - keep subtasks with their parent
   // First, sort parent tasks by section and date
-  const timelineParents = tasks.filter(t => !t.isSubtask);
+  const timelineParents = tasks.filter((t) => !t.isSubtask);
   timelineParents.sort((a, b) => {
     if (a.sectionOrder !== b.sectionOrder) {
       return a.sectionOrder - b.sectionOrder;
@@ -233,10 +278,10 @@ function processRecords(records, today = null) {
 
   // Rebuild timeline with subtasks after their parent
   const timelineTasks = [];
-  timelineParents.forEach(parent => {
+  timelineParents.forEach((parent) => {
     timelineTasks.push(parent);
     const subtasks = subtasksByParent[parent.name] || [];
-    subtasks.forEach(subtask => timelineTasks.push(subtask));
+    subtasks.forEach((subtask) => timelineTasks.push(subtask));
   });
 
   return {
@@ -246,11 +291,11 @@ function processRecords(records, today = null) {
     stats,
     timeline: timelineTasks,
     projectRange: {
-      start: projectStart ? projectStart.toISOString().split('T')[0] : null,
-      end: projectEnd ? projectEnd.toISOString().split('T')[0] : null,
-      days: projectSpan
+      start: projectStart ? projectStart.toISOString().split("T")[0] : null,
+      end: projectEnd ? projectEnd.toISOString().split("T")[0] : null,
+      days: projectSpan,
     },
-    customFieldNames
+    customFieldNames,
   };
 }
 
@@ -258,8 +303,15 @@ function processRecords(records, today = null) {
 function isDoneSection(section) {
   if (!section) return false;
   const lower = section.toLowerCase();
-  const donePatterns = ['done', 'complete', 'completed', 'finished', 'closed', 'resolved'];
-  return donePatterns.some(pattern => lower.includes(pattern));
+  const donePatterns = [
+    "done",
+    "complete",
+    "completed",
+    "finished",
+    "closed",
+    "resolved",
+  ];
+  return donePatterns.some((pattern) => lower.includes(pattern));
 }
 
 function isOverdue(dueDate, section, today) {
@@ -276,19 +328,19 @@ function daysUntil(dueDate, today) {
 }
 
 function priorityOrder(priority) {
-  const order = { 'High': 1, 'Medium': 2, 'Low': 3 };
+  const order = { High: 1, Medium: 2, Low: 3 };
   return order[priority] || 4;
 }
 
 function calculateStats(tasks, sections, sectionNames) {
   const total = tasks.length;
-  const done = tasks.filter(t => t.isDone).length;
-  const overdue = tasks.filter(t => t.isOverdue).length;
+  const done = tasks.filter((t) => t.isDone).length;
+  const overdue = tasks.filter((t) => t.isOverdue).length;
 
   // By status - dynamically collect all statuses (including "No status")
   const byStatus = {};
   let noStatusCount = 0;
-  tasks.forEach(t => {
+  tasks.forEach((t) => {
     if (t.status) {
       byStatus[t.status] = (byStatus[t.status] || 0) + 1;
     } else {
@@ -296,13 +348,13 @@ function calculateStats(tasks, sections, sectionNames) {
     }
   });
   if (noStatusCount > 0) {
-    byStatus['No status'] = noStatusCount;
+    byStatus["No status"] = noStatusCount;
   }
 
   // By priority - dynamically collect all priorities (including "No priority")
   const byPriority = {};
   let noPriorityCount = 0;
-  tasks.forEach(t => {
+  tasks.forEach((t) => {
     if (t.priority) {
       byPriority[t.priority] = (byPriority[t.priority] || 0) + 1;
     } else {
@@ -310,18 +362,18 @@ function calculateStats(tasks, sections, sectionNames) {
     }
   });
   if (noPriorityCount > 0) {
-    byPriority['No priority'] = noPriorityCount;
+    byPriority["No priority"] = noPriorityCount;
   }
 
   // By assignee
   const byAssignee = {};
-  tasks.forEach(t => {
+  tasks.forEach((t) => {
     byAssignee[t.assignee] = (byAssignee[t.assignee] || 0) + 1;
   });
 
   // By section
   const bySection = {};
-  sectionNames.forEach(name => {
+  sectionNames.forEach((name) => {
     bySection[name] = sections[name].length;
   });
 
@@ -333,7 +385,7 @@ function calculateStats(tasks, sections, sectionNames) {
     byStatus,
     byPriority,
     byAssignee,
-    bySection
+    bySection,
   };
 }
 

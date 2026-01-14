@@ -7,14 +7,18 @@
     "build": "eleventy",
     "test": "jest --testPathIgnorePatterns=integration",
     "test:watch": "jest --watch --testPathIgnorePatterns=integration",
-    "test:integration": "TEST_TYPE=integration jest tests/integration.test.js"
+    "test:integration": "TEST_TYPE=integration jest tests/integration.test.js",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
   },
   "dependencies": {
     "@11ty/eleventy": "^3.1.2",
     "csv-parse": "^6.1.0"
   },
   "devDependencies": {
-    "jest": "^30.2.0",
-    "cheerio": "^1.1.2"
+    "@biomejs/biome": "^2.3.11",
+    "cheerio": "^1.1.2",
+    "jest": "^30.2.0"
   }
 }

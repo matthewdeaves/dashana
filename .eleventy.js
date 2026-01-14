@@ -1,4 +1,4 @@
-module.exports = function(eleventyConfig) {
+module.exports = function (eleventyConfig) {
   // Get version from environment (set by build script)
   const version = process.env.DASHANA_VERSION || null;
 
@@ -19,9 +19,9 @@ module.exports = function(eleventyConfig) {
       input: "src",
       output: "_site",
       includes: "_includes",
-      data: "_data"
+      data: "_data",
     },
     templateFormats: ["njk", "md"],
-    htmlTemplateEngine: "njk"
+    htmlTemplateEngine: "njk",
   };
 };

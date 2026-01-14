@@ -4,6 +4,10 @@ Share project status with customers who don't have access to your Asana instance
 
 **[Live Demo](https://matthewdeaves.github.io/dashana/)**
 
+## How It Works
+
+Dashana displays your Asana data exactly as exported - tasks stay in their sections, statuses remain unchanged. This makes it ideal for projects used as process checklists where task placement is intentional. The only calculated field is **Duration** (days between start and due dates).
+
 ## Quick Start
 
 1. **Click "Use this template"** on GitHub to create your repo

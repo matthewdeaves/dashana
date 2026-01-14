@@ -1,8 +1,9 @@
 # Phase 10: Robustness & Code Quality
 
-> **Goal:** Improve error handling, date consistency, accessibility, code quality tooling, and display configuration.
-> **Sessions:** 4
+> **Goal:** Improve error handling, date consistency, accessibility, code quality tooling, display configuration, timeline UX, and visual comfort.
+> **Sessions:** 6
 > **Prerequisites:** Phases 1-9 complete (working site)
+> **Last Updated:** 2026-01-14 (verified against current codebase)
 
 ## Scope
 
@@ -16,12 +17,29 @@ This phase implements P1 and P2 improvements from the January 2026 code review:
 - Build script robustness
 - Colorblind-friendly status indicators
 - Display configuration (tab visibility, column visibility, card items)
+- **Timeline duration bar refactor** (added 2026-01-14)
+- **Light theme refinement** - reduce eye strain (added 2026-01-14)
 
 **Out of Scope (future consideration):**
 - CSS modularization (large refactor, minimal user impact)
 - JSON config format (current format works well)
 - CSP headers (GitHub Pages limitations)
 - Test architecture refactor (tests already pass reliably)
+
+---
+
+## Current Code State (as of 2026-01-14)
+
+Before starting any session, verify these assumptions:
+
+| File | Current State |
+|------|---------------|
+| `package.json` | No Biome (only eleventy, csv-parse, jest, cheerio) |
+| `src/_data/config.js` | 27 lines, basic key=value parsing |
+| `src/_data/tasks.js` | Uses `setHours(0,0,0,0)` for dates (timezone-dependent) |
+| `src/_includes/components/filter-toggle.njk` | Has `aria-label` but missing `aria-pressed` |
+| `src/_includes/components/task-card.njk` | Uses `.task-status` text badges (not SVG indicators) |
+| `src/timeline.njk` | Tables lack `scope="col"` attributes |
 
 ---
 
@@ -33,6 +51,8 @@ This phase implements P1 and P2 improvements from the January 2026 code review:
 | 10-B | 10.4 - 10.7 | Date handling, error states, CSV validation |
 | 10-C | 10.8 - 10.11 | Accessibility improvements |
 | 10-D | 10.12 - 10.16 | Display configuration (tabs, columns, cards) |
+| 10-E | 10.17 - 10.20 | **Timeline duration bar refactor** |
+| 10-F | 10.21 - 10.22 | **Light theme refinement** (reduce eye strain) |
 
 ---
 
@@ -326,33 +346,40 @@ const validationWarnings = validateRecords(records);
 
 ### Task 10.8: Add ARIA Attributes to Filter Toggle
 
-Update `src/_includes/components/filter-toggle.njk`:
+**Current state:** Filter button already has `aria-label` but is missing `aria-pressed`.
+
+Update `src/_includes/components/filter-toggle.njk` to add `aria-pressed`:
 
 ```njk
-<button id="filter-toggle"
-        class="filter-btn"
-        type="button"
-        aria-pressed="false"
-        aria-label="Filter to show open tasks only">
-  <span class="filter-label">Show Open Only</span>
-</button>
+{# BEFORE: #}
+{# <button class="filter-btn active" id="filter-toggle" aria-label="Toggle task filter"> #}
+
+{# AFTER: #}
+<div class="filter-toggle">
+  <button class="filter-btn active" id="filter-toggle"
+          aria-label="Toggle task filter"
+          aria-pressed="false">
+    <span class="filter-label-all">All Tasks</span>
+    <span class="filter-label-open">Open Only</span>
+  </button>
+</div>
 ```
 
-Update the JavaScript in `src/_includes/layouts/base.njk` (or wherever the toggle script lives):
+Update the JavaScript in `src/_includes/layouts/base.njk` to toggle `aria-pressed`:
 
+Find the filter toggle click handler and add:
 ```javascript
 filterToggle.addEventListener('click', function() {
   const isPressed = this.getAttribute('aria-pressed') === 'true';
   this.setAttribute('aria-pressed', !isPressed);
-  // ... existing toggle logic
+  // ... existing toggle logic (classList toggle, etc.)
 });
 ```
 
 **Acceptance:**
-- [ ] Filter button has `aria-pressed` attribute
-- [ ] Filter button has `aria-label` attribute
-- [ ] `aria-pressed` updates when button is clicked
-- [ ] Button is keyboard accessible (can activate with Enter/Space)
+- [ ] Filter button has `aria-pressed="false"` initial attribute
+- [ ] `aria-pressed` toggles between "true"/"false" when button is clicked
+- [ ] Existing filter functionality still works
 
 ---
 
@@ -398,37 +425,42 @@ Update table headers in `src/timeline.njk`:
 
 **Problem:** Status indicators rely solely on color, which is inaccessible to colorblind users.
 
-Update `src/_includes/components/task-card.njk` (or wherever status is displayed):
+**Current state:** `task-card.njk` uses text badges with `.task-status` class (lines 23-25):
+```njk
+{% if task.status %}
+  <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+{% endif %}
+```
+
+**Solution:** Add shape prefixes to status badges while keeping text. This works with the existing structure.
+
+Update `src/_includes/components/task-card.njk` status display:
 
 ```njk
-<span class="status-indicator status-{{ task.status | lower | replace(' ', '-') }}">
-  <span class="visually-hidden">{{ task.status }}</span>
-  {% if task.status == 'On track' %}
-    <svg aria-hidden="true" class="status-icon" viewBox="0 0 16 16" fill="currentColor">
-      <circle cx="8" cy="8" r="6"/>
-    </svg>
-  {% elif task.status == 'At risk' %}
-    <svg aria-hidden="true" class="status-icon" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M8 1l7 14H1L8 1z"/>
-    </svg>
-  {% elif task.status == 'Off track' %}
-    <svg aria-hidden="true" class="status-icon" viewBox="0 0 16 16" fill="currentColor">
-      <rect x="2" y="2" width="12" height="12"/>
-    </svg>
-  {% else %}
-    <svg aria-hidden="true" class="status-icon" viewBox="0 0 16 16" fill="currentColor">
-      <circle cx="8" cy="8" r="6"/>
-    </svg>
-  {% endif %}
+{% if task.status %}
+  <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">
+    {# Shape indicator for colorblind users #}
+    {% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %}
+    {{ task.status }}
+  </span>
+{% endif %}
+```
+
+Also update status badges in tables (`src/tasks.njk` and `src/timeline.njk`):
+
+```njk
+<span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">
+  {% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %}
+  {{ task.status }}
 </span>
 ```
 
-Shapes used:
-- **On track:** Circle (universal "good" shape)
-- **At risk:** Triangle (warning shape)
-- **Off track:** Square (stop/alert shape)
+Shapes used (Unicode):
+- **On track:** ● (U+25CF Black Circle)
+- **At risk:** ▲ (U+25B2 Black Up-Pointing Triangle)
+- **Off track:** ■ (U+25A0 Black Square)
 
-Add styles to `src/css/styles.css`:
+Add styles to `src/css/styles.css` for visually hidden utility (may be needed elsewhere):
 
 ```css
 /* Visually Hidden (for screen readers) */
@@ -443,22 +475,12 @@ Add styles to `src/css/styles.css`:
   white-space: nowrap;
   border: 0;
 }
-
-/* Status Icons */
-.status-icon {
-  width: 12px;
-  height: 12px;
-}
-
-.status-on-track .status-icon { color: var(--color-on-track); }
-.status-at-risk .status-icon { color: var(--color-at-risk); }
-.status-off-track .status-icon { color: var(--color-off-track); }
 ```
 
 **Acceptance:**
-- [ ] Status indicators show distinct shapes (circle, triangle, square)
-- [ ] Screen reader announces status text via `.visually-hidden`
-- [ ] Icons maintain color coding for sighted users
+- [ ] Status badges show shape prefix (●, ▲, ■)
+- [ ] Shapes appear before status text in cards and tables
+- [ ] Existing color coding still works
 - [ ] Shapes are distinguishable without color
 
 ---
@@ -982,6 +1004,363 @@ CARD_SHOW_CUSTOM=NO
 
 ---
 
+## Session 10-E: Timeline Duration Bar Refactor
+
+### Background
+
+**Problem:** The current duration bar shows task position/width relative to the entire project timeline. This is confusing because:
+- A 10-day task in a 100-day project shows as a tiny 10% bar
+- Users can't tell actual task duration at a glance
+- No indication of time elapsed vs. remaining
+
+**Current implementation** (`tasks.js:195-217`):
+```javascript
+// Position within project span
+startPercent = (taskStart - projectStart) / projectSpan * 100
+// Width as fraction of project
+widthPercent = taskDuration / projectSpan * 100
+```
+
+**New design:** Show elapsed time vs. total duration per task:
+- Bar fills from left to right as time passes
+- Text overlay shows actual days (e.g., "5d" or "3/7d")
+- Green when on track, red when overdue, gray when done
+
+---
+
+### Task 10.17: Update Task Data Model for Duration Progress
+
+Update `src/_data/tasks.js` to calculate elapsed/remaining days.
+
+Add duration calculation helper after the existing helper functions:
+
+```javascript
+/**
+ * Calculate duration info for a task.
+ * Days calculation: inclusive of start, exclusive of end (e.g., Jan 1-5 = 4 days).
+ */
+function calculateDuration(startDate, dueDate, today) {
+  const start = startDate ? new Date(startDate) : null;
+  const end = dueDate ? new Date(dueDate) : null;
+
+  // No dates = no duration
+  if (!start && !end) {
+    return null;
+  }
+
+  // Use start for both if only start, or due for both if only due
+  const effectiveStart = start || end;
+  const effectiveEnd = end || start;
+
+  // Duration in days (exclusive of end)
+  const durationDays = Math.max(1, Math.ceil((effectiveEnd - effectiveStart) / (1000 * 60 * 60 * 24)));
+
+  // Days elapsed from start to today (capped at duration)
+  const elapsedMs = today - effectiveStart;
+  const elapsedDays = Math.max(0, Math.min(durationDays, Math.ceil(elapsedMs / (1000 * 60 * 60 * 24))));
+
+  // Percentage elapsed (capped at 100)
+  const percentElapsed = Math.min(100, Math.round((elapsedDays / durationDays) * 100));
+
+  return {
+    days: durationDays,
+    elapsed: elapsedDays,
+    remaining: Math.max(0, durationDays - elapsedDays),
+    percentElapsed: percentElapsed,
+    hasStarted: elapsedMs >= 0,
+    isComplete: elapsedDays >= durationDays
+  };
+}
+```
+
+In `processRecords`, update the task object to include duration info:
+
+```javascript
+// After existing timeline calculation (around line 217)
+task.duration = calculateDuration(task.startDate, task.dueDate, today);
+```
+
+Export for testing:
+```javascript
+module.exports.calculateDuration = calculateDuration;
+```
+
+**Acceptance:**
+- [ ] `calculateDuration` function added
+- [ ] Each task has `duration` property with `days`, `elapsed`, `remaining`, `percentElapsed`
+- [ ] `npm test` passes
+
+---
+
+### Task 10.18: Update Timeline Template
+
+Update `src/timeline.njk` to show new duration bar:
+
+Replace the duration bar cell (lines 59-68):
+
+```njk
+<td class="col-bar">
+  {% if task.duration %}
+  <div class="duration-bar-container">
+    <div class="duration-bar
+                {% if task.isDone %}done{% elif task.isOverdue %}overdue{% elif task.duration.hasStarted %}in-progress{% else %}not-started{% endif %}"
+         style="width: {{ task.duration.percentElapsed }}%">
+    </div>
+    <span class="duration-text">
+      {% if task.isDone %}
+        {{ task.duration.days }}d ✓
+      {% elif task.isOverdue %}
+        {{ task.duration.days }}d (overdue)
+      {% elif task.duration.hasStarted %}
+        {{ task.duration.elapsed }}/{{ task.duration.days }}d
+      {% else %}
+        {{ task.duration.days }}d
+      {% endif %}
+    </span>
+  </div>
+  {% else %}
+  <span class="no-dates-label">No dates</span>
+  {% endif %}
+</td>
+```
+
+**Acceptance:**
+- [ ] Duration bar shows percentage elapsed, not project-relative position
+- [ ] Days displayed inside bar (e.g., "3/7d")
+- [ ] Different states: not-started, in-progress, done, overdue
+
+---
+
+### Task 10.19: Update Duration Bar Styles
+
+Update `src/css/styles.css` - replace timeline bar styles:
+
+```css
+/* Timeline Duration Bar (refactored) */
+.duration-bar-container {
+  position: relative;
+  height: 24px;
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.duration-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--color-border);
+  border-radius: 3px 0 0 3px;
+  transition: width 0.3s ease;
+}
+
+.duration-bar.in-progress {
+  background: var(--color-accent);
+}
+
+.duration-bar.done {
+  background: var(--color-on-track);
+}
+
+.duration-bar.overdue {
+  background: var(--color-off-track);
+}
+
+.duration-bar.not-started {
+  width: 0 !important;
+}
+
+.duration-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* Ensure text is readable on filled bars */
+.duration-bar-container:has(.duration-bar.in-progress[style*="width: 100%"]) .duration-text,
+.duration-bar-container:has(.duration-bar.done) .duration-text,
+.duration-bar-container:has(.duration-bar.overdue) .duration-text {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Fallback for browsers without :has() - rely on contrast */
+.duration-bar.done ~ .duration-text,
+.duration-bar.overdue ~ .duration-text {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+```
+
+Remove or deprecate old timeline bar styles (`.timeline-bar-container`, `.timeline-bar`).
+
+**Acceptance:**
+- [ ] Bar fills left-to-right showing elapsed time
+- [ ] Day count text visible and readable
+- [ ] Different colors for states: gray (not started), blue (in progress), green (done), red (overdue)
+- [ ] Text remains readable on both empty and filled bars
+
+---
+
+### Task 10.20: Add Duration Tests
+
+Add tests to `tests/data-processing.test.js`:
+
+```javascript
+describe('calculateDuration', () => {
+  const { calculateDuration } = require('../src/_data/tasks.js');
+
+  test('calculates days inclusive start exclusive end', () => {
+    const today = new Date('2026-01-10');
+    const result = calculateDuration('2026-01-01', '2026-01-05', today);
+    expect(result.days).toBe(4); // Jan 1, 2, 3, 4 (not 5)
+  });
+
+  test('calculates elapsed days', () => {
+    const today = new Date('2026-01-03');
+    const result = calculateDuration('2026-01-01', '2026-01-10', today);
+    expect(result.elapsed).toBe(2); // Jan 1, 2
+    expect(result.percentElapsed).toBe(22); // 2/9 ≈ 22%
+  });
+
+  test('caps elapsed at duration', () => {
+    const today = new Date('2026-01-20'); // past due
+    const result = calculateDuration('2026-01-01', '2026-01-10', today);
+    expect(result.elapsed).toBe(9);
+    expect(result.percentElapsed).toBe(100);
+  });
+
+  test('returns null when no dates', () => {
+    const today = new Date('2026-01-10');
+    expect(calculateDuration(null, null, today)).toBeNull();
+  });
+
+  test('handles start-only tasks', () => {
+    const today = new Date('2026-01-05');
+    const result = calculateDuration('2026-01-01', null, today);
+    expect(result.days).toBe(1); // single day
+  });
+});
+```
+
+**Acceptance:**
+- [ ] All new tests pass
+- [ ] Existing tests still pass
+- [ ] Edge cases covered: no dates, past due, future start
+
+---
+
+## Session 10-F: Light Theme Refinement
+
+### Background
+
+**Problem:** The current light theme uses pure white (#ffffff) backgrounds which can cause eye strain, especially during extended use. The theme needs to be "warmer" and less harsh while still feeling light and professional.
+
+**Current light theme values** (`styles.css:1-32`):
+```css
+:root {
+  --color-bg: #ffffff;        /* Pure white - TOO BRIGHT */
+  --color-bg-alt: #f9fafb;    /* Near-white */
+  --color-bg-tertiary: #f0f0f0;
+  --color-text: #333333;
+  --color-border: #e5e5e5;
+  ...
+}
+```
+
+**Goal:** Shift to softer off-white/warm gray tones that reduce contrast without looking "dirty" or washed out.
+
+---
+
+### Task 10.21: Update Light Theme Color Palette
+
+Update `src/css/styles.css` `:root` section with softer colors:
+
+```css
+/* Light theme (default) - REFINED for reduced eye strain */
+:root {
+  /* Base colors - warmer, softer whites */
+  --color-bg: #fafafa;              /* Was #ffffff - soft off-white */
+  --color-bg-alt: #f5f5f4;          /* Was #f9fafb - warm light gray */
+  --color-bg-tertiary: #e7e5e4;     /* Was #f0f0f0 - stone gray */
+  --color-text: #292524;            /* Was #333333 - warm dark */
+  --color-text-muted: #78716c;      /* Was #666666 - stone muted */
+  --color-border: #d6d3d1;          /* Was #e5e5e5 - visible but soft */
+  --color-accent: #0066cc;          /* Keep - good contrast */
+  --color-accent-hover: #0052a3;    /* Keep */
+
+  /* Status colors - slightly muted for softer appearance */
+  --color-on-track: #16a34a;        /* Was #22c55e - slightly deeper green */
+  --color-on-track-bg: #f0fdf4;     /* Keep */
+  --color-at-risk: #ca8a04;         /* Was #eab308 - deeper amber */
+  --color-at-risk-bg: #fefce8;      /* Keep */
+  --color-off-track: #dc2626;       /* Was #ef4444 - slightly deeper red */
+  --color-off-track-bg: #fef2f2;    /* Keep */
+
+  /* Priority colors - match status adjustments */
+  --color-priority-high: #dc2626;   /* Was #ef4444 */
+  --color-priority-medium: #a16207; /* Keep - already warm */
+  --color-priority-low: #15803d;    /* Keep */
+
+  /* Component colors */
+  --color-card-bg: #fafafa;         /* Match --color-bg */
+  --color-card-border: var(--color-border);
+  --color-table-header: #f5f5f4;    /* Match --color-bg-alt */
+  --color-table-row-alt: rgba(0, 0, 0, 0.02);
+  --color-table-hover: #e7e5e4;     /* Match --color-bg-tertiary */
+}
+```
+
+**Color philosophy:**
+- Shifted from pure grays to "stone" palette (slight warm undertone)
+- Main background: #fafafa (98% white) instead of #ffffff (100%)
+- Borders more visible but not harsh
+- Status/priority colors slightly deeper for better readability on softer backgrounds
+
+**Acceptance:**
+- [ ] No pure white (#ffffff) backgrounds
+- [ ] Text remains highly readable (WCAG AA contrast)
+- [ ] Overall appearance feels "warmer" and softer
+- [ ] Status badges still clearly distinguishable
+
+---
+
+### Task 10.22: Verify Contrast and Readability
+
+After applying new colors, verify accessibility:
+
+1. **Manual check:** View all pages (Dashboard, Board, Tasks, Timeline)
+2. **Contrast verification:** Text should meet WCAG AA (4.5:1 for body text)
+
+Key contrast checks:
+| Element | Foreground | Background | Required |
+|---------|------------|------------|----------|
+| Body text | #292524 | #fafafa | 4.5:1 ✓ |
+| Muted text | #78716c | #fafafa | 4.5:1 ✓ |
+| Accent links | #0066cc | #fafafa | 4.5:1 ✓ |
+| Table header text | #78716c | #f5f5f4 | 4.5:1 ✓ |
+
+Calculated contrasts (verify with tool like WebAIM):
+- #292524 on #fafafa = ~13.5:1 ✓
+- #78716c on #fafafa = ~4.8:1 ✓
+- #0066cc on #fafafa = ~5.4:1 ✓
+
+**Acceptance:**
+- [ ] All text passes WCAG AA contrast (4.5:1)
+- [ ] No accessibility regressions
+- [ ] Theme looks professional, not washed out
+- [ ] Print stylesheet still works (may need separate check)
+
+---
+
 ## Phase 10 Completion Checklist
 
 **Session 10-A (Code Quality):**
@@ -997,7 +1376,7 @@ CARD_SHOW_CUSTOM=NO
 **Session 10-C (Accessibility):**
 - [ ] Filter toggle has ARIA attributes
 - [ ] Tables have scope attributes
-- [ ] Status indicators have distinct shapes
+- [ ] Status indicators have distinct shapes (●▲■)
 - [ ] Build script has clear error messages
 
 **Session 10-D (Display Configuration):**
@@ -1008,11 +1387,27 @@ CARD_SHOW_CUSTOM=NO
 - [ ] Board cards respect item settings
 - [ ] Example config documented
 
+**Session 10-E (Duration Bar):**
+- [ ] `calculateDuration` function implemented
+- [ ] Tasks have elapsed/remaining day counts
+- [ ] Duration bar shows progress (left-to-right fill)
+- [ ] Day count text displayed inside bar
+- [ ] Color states: gray/blue/green/red
+- [ ] Duration tests pass
+
+**Session 10-F (Light Theme):**
+- [ ] Background shifted from pure white to off-white (#fafafa)
+- [ ] Borders and muted text use warm stone tones
+- [ ] Status colors slightly deeper for contrast
+- [ ] All text passes WCAG AA contrast (4.5:1)
+- [ ] Theme feels softer but professional
+
 **Final Verification:**
 - [ ] All tests pass: `npm test`
 - [ ] Lint passes: `npm run lint`
 - [ ] Site builds: `npm run build`
 - [ ] Test with modified config (hide some tabs/columns)
+- [ ] Duration bars display correctly on timeline page
 
 ---
 
@@ -1041,6 +1436,18 @@ Read plans/PHASE-10-ROBUSTNESS.md and implement session 10-C.
 Read plans/PHASE-10-ROBUSTNESS.md and implement session 10-D.
 ```
 
+### Session 10-E (Duration Bar Refactor)
+```
+/clear
+Read plans/PHASE-10-ROBUSTNESS.md and implement session 10-E.
+```
+
+### Session 10-F (Light Theme Refinement)
+```
+/clear
+Read plans/PHASE-10-ROBUSTNESS.md and implement session 10-F.
+```
+
 ---
 
 ## Reference: Original Code Review
@@ -1060,3 +1467,5 @@ This phase implements findings from the January 2026 code review. The full analy
 | Build script error handling | Medium | Low | Task 10.11 |
 | Table accessibility | Medium | Low | Task 10.9 |
 | Display configuration | High | Medium | Task 10.12-10.16 |
+| **Duration bar refactor** | **High** | **Medium** | Task 10.17-10.20 |
+| **Light theme refinement** | **High** | **Low** | Task 10.21-10.22 |

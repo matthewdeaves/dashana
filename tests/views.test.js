@@ -308,10 +308,10 @@ describe("Timeline View", () => {
     expect(noDateLabels).toBe(6);
   });
 
-  test("tasks with dates have timeline bars", () => {
-    const timelineBars = $(".timeline-bar").length;
+  test("tasks with dates have duration bars", () => {
+    const durationBars = $(".duration-bar").length;
     // 4 tasks with dates: Task One, Two, Three, Five
-    expect(timelineBars).toBe(4);
+    expect(durationBars).toBe(4);
   });
 
   test("has correct table headers", () => {

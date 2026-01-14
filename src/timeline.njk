@@ -4,6 +4,12 @@ title: Timeline
 permalink: /timeline/
 ---
 
+{% if not config.tabs.timeline %}
+<div class="page-disabled">
+  <p>This view has been disabled in the configuration.</p>
+  <a href="{{ pathPrefix }}/">Return to Dashboard</a>
+</div>
+{% else %}
 <div class="timeline-page">
   <div class="page-header">
     <div class="page-header-top">
@@ -23,25 +29,30 @@ permalink: /timeline/
     <table class="timeline-table">
       <thead>
         <tr>
-          <th class="col-name">Task</th>
-          <th class="col-completion">Progress</th>
-          <th class="col-section">Section</th>
-          <th class="col-start">Start</th>
-          <th class="col-due">Due</th>
-          <th class="col-bar">Duration</th>
-          <th class="col-status">Status</th>
-          <th class="col-tags">Tags</th>
-          <th class="col-parent">Parent</th>
-          <th class="col-notes">Notes</th>
-          {% for fieldName in tasks.customFieldNames %}
-          <th class="col-custom">{{ fieldName }}</th>
-          {% endfor %}
+          {% if config.timelineColumns.name %}<th scope="col" class="col-name">Task</th>{% endif %}
+          {% if config.timelineColumns.progress %}<th scope="col" class="col-completion">Progress</th>{% endif %}
+          {% if config.timelineColumns.section %}<th scope="col" class="col-section">Section</th>{% endif %}
+          {% if config.timelineColumns.start %}<th scope="col" class="col-start">Start</th>{% endif %}
+          {% if config.timelineColumns.due %}<th scope="col" class="col-due">Due</th>{% endif %}
+          {% if config.timelineColumns.duration %}<th scope="col" class="col-bar">Duration</th>{% endif %}
+          {% if config.timelineColumns.status %}<th scope="col" class="col-status">Status</th>{% endif %}
+          {% if config.timelineColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
+          {% if config.timelineColumns.parent %}<th scope="col" class="col-parent">Parent</th>{% endif %}
+          {% if config.timelineColumns.notes %}<th scope="col" class="col-notes">Notes</th>{% endif %}
+          {% if config.timelineColumns.custom %}
+            {% for fieldName in tasks.customFieldNames %}
+            <th scope="col" class="col-custom">{{ fieldName }}</th>
+            {% endfor %}
+          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for task in tasks.timeline %}
         <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if not task.startDate and not task.dueDate %}row-no-dates{% endif %} {% if task.isSubtask %}row-subtask{% endif %}">
+          {% if config.timelineColumns.name %}
           <td class="col-name">{% if task.isSubtask %}<span class="subtask-indent">↳</span> {% endif %}{{ task.name }}</td>
+          {% endif %}
+          {% if config.timelineColumns.progress %}
           <td class="col-completion">
             {% if task.isDone %}
               <span class="completion-label completion-done">Done</span>
@@ -49,31 +60,54 @@ permalink: /timeline/
               <span class="completion-label completion-open">Open</span>
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.section %}
           <td class="col-section">
             <span class="section-badge">{{ task.section }}</span>
           </td>
+          {% endif %}
+          {% if config.timelineColumns.start %}
           <td class="col-start">{{ task.startDate if task.startDate else '—' }}</td>
+          {% endif %}
+          {% if config.timelineColumns.due %}
           <td class="col-due {% if task.isOverdue %}overdue{% endif %}">
             {{ task.dueDate if task.dueDate else '—' }}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.duration %}
           <td class="col-bar">
-            {% if task.timeline %}
-            <div class="timeline-bar-container">
-              <div class="timeline-bar {% if task.isOverdue %}overdue{% endif %} {% if task.isDone %}done{% endif %}"
-                   style="left: {{ task.timeline.startPercent }}%; width: {{ task.timeline.widthPercent }}%">
+            {% if task.duration %}
+            <div class="duration-bar-container">
+              <div class="duration-bar {% if task.isDone %}done{% elif task.isOverdue %}overdue{% elif task.duration.hasStarted %}in-progress{% else %}not-started{% endif %}"
+                   style="width: {{ task.duration.percentElapsed }}%">
               </div>
+              <span class="duration-text">
+                {% if task.isDone %}
+                  {{ task.duration.days }}d ✓
+                {% elif task.isOverdue %}
+                  {{ task.duration.days }}d (overdue)
+                {% elif task.duration.hasStarted %}
+                  {{ task.duration.elapsed }}/{{ task.duration.days }}d
+                {% else %}
+                  {{ task.duration.days }}d
+                {% endif %}
+              </span>
             </div>
             {% else %}
             <span class="no-dates-label">No dates</span>
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.status %}
           <td class="col-status">
             {% if task.status %}
-              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %} {{ task.status }}</span>
             {% else %}
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.tags %}
           <td class="col-tags">
             {% if task.tags.length > 0 %}
               {% for tag in task.tags %}
@@ -83,6 +117,8 @@ permalink: /timeline/
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.parent %}
           <td class="col-parent">
             {% if task.parentTask %}
               <span class="parent-ref">{{ task.parentTask }}</span>
@@ -90,6 +126,8 @@ permalink: /timeline/
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.timelineColumns.notes %}
           <td class="col-notes">
             {% if task.notes %}
               <span class="notes-icon" title="{{ task.notes }}">📝</span>
@@ -97,15 +135,18 @@ permalink: /timeline/
               —
             {% endif %}
           </td>
-          {% for fieldName in tasks.customFieldNames %}
-          <td class="col-custom">
-            {% if task.customFields and task.customFields[fieldName] %}
-              <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          {% endfor %}
+          {% endif %}
+          {% if config.timelineColumns.custom %}
+            {% for fieldName in tasks.customFieldNames %}
+            <td class="col-custom">
+              {% if task.customFields and task.customFields[fieldName] %}
+                <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            {% endfor %}
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -115,3 +156,4 @@ permalink: /timeline/
   <p class="empty-state">No tasks found.</p>
   {% endif %}
 </div>
+{% endif %}

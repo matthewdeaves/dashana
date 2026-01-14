@@ -4,6 +4,13 @@ title: Dashboard
 permalink: /
 ---
 
+{% if tasks.error %}
+<div class="error-banner" role="alert">
+  <strong>Data Error:</strong> {{ tasks.error.message }}
+  <p class="error-hint">{{ tasks.error.hint }}</p>
+</div>
+{% endif %}
+
 <div class="dashboard">
   <div class="dashboard-header">
     <h2>Project Overview</h2>

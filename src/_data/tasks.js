@@ -24,6 +24,47 @@ const KNOWN_FIELDS = [
   "Blocking (Dependencies)",
 ];
 
+// CSV validation constants
+const REQUIRED_FIELDS = ["Name"];
+const RECOMMENDED_FIELDS = ["Section/Column", "Assignee", "Due Date"];
+
+/**
+ * Validate CSV records and log warnings for missing/invalid data.
+ * Returns array of warnings (non-blocking).
+ */
+function validateRecords(records) {
+  const warnings = [];
+
+  records.forEach((record, index) => {
+    // Check required fields
+    for (const field of REQUIRED_FIELDS) {
+      if (!record[field]?.trim()) {
+        warnings.push(`Row ${index + 2}: Missing required field "${field}"`);
+      }
+    }
+  });
+
+  // Check if recommended fields exist in header
+  if (records.length > 0) {
+    const fields = Object.keys(records[0]);
+    for (const field of RECOMMENDED_FIELDS) {
+      if (!fields.includes(field)) {
+        warnings.push(`CSV missing recommended column "${field}"`);
+      }
+    }
+  }
+
+  if (warnings.length > 0) {
+    console.warn("CSV validation warnings:");
+    warnings.slice(0, 10).forEach((w) => console.warn(`  ${w}`));
+    if (warnings.length > 10) {
+      console.warn(`  ... and ${warnings.length - 10} more warnings`);
+    }
+  }
+
+  return warnings;
+}
+
 module.exports = function () {
   const csvPath = path.join(__dirname, "../../data/project.csv");
 
@@ -37,15 +78,33 @@ module.exports = function () {
 
     return processRecords(records);
   } catch (e) {
-    console.warn("data/project.csv not found:", e.message);
+    console.warn("CSV load error:", e.message);
     return {
       all: [],
       sections: {},
       sectionNames: [],
-      stats: {},
+      stats: {
+        total: 0,
+        done: 0,
+        open: 0,
+        overdue: 0,
+        completionPercent: 0,
+        bySection: {},
+        byStatus: {},
+        byPriority: {},
+        byAssignee: {},
+      },
       timeline: [],
       projectRange: { start: null, end: null, days: 0 },
       customFieldNames: [],
+      error: {
+        message: e.message,
+        type: e.code === "ENOENT" ? "CSV_NOT_FOUND" : "CSV_PARSE_ERROR",
+        hint:
+          e.code === "ENOENT"
+            ? "Ensure data/project.csv exists"
+            : "Check CSV format matches Asana export",
+      },
     };
   }
 };
@@ -55,6 +114,9 @@ function processRecords(records, today = null) {
     today = new Date();
   }
   today.setHours(0, 0, 0, 0);
+
+  // Validate records and log warnings (non-blocking)
+  validateRecords(records);
 
   // Collect all custom field names (columns not in KNOWN_FIELDS)
   const customFieldNames =
@@ -259,6 +321,9 @@ function processRecords(records, today = null) {
     } else {
       task.timeline = null;
     }
+
+    // Calculate duration info for timeline display
+    task.duration = calculateDuration(task.startDate, task.dueDate, today);
   });
 
   // Sort for timeline view - keep subtasks with their parent
@@ -299,6 +364,62 @@ function processRecords(records, today = null) {
   };
 }
 
+/**
+ * Normalize a date to UTC midnight for consistent comparisons.
+ * Avoids timezone-dependent behavior in overdue calculations.
+ */
+function normalizeToUTC(date) {
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  );
+}
+
+/**
+ * Calculate duration info for a task.
+ * Days calculation: inclusive of start, exclusive of end (e.g., Jan 1-5 = 4 days).
+ */
+function calculateDuration(startDate, dueDate, today) {
+  const start = startDate ? new Date(startDate) : null;
+  const end = dueDate ? new Date(dueDate) : null;
+
+  // No dates = no duration
+  if (!start && !end) {
+    return null;
+  }
+
+  // Use start for both if only start, or due for both if only due
+  const effectiveStart = start || end;
+  const effectiveEnd = end || start;
+
+  // Duration in days (exclusive of end)
+  const durationDays = Math.max(
+    1,
+    Math.ceil((effectiveEnd - effectiveStart) / (1000 * 60 * 60 * 24)),
+  );
+
+  // Days elapsed from start to today (capped at duration)
+  const elapsedMs = today - effectiveStart;
+  const elapsedDays = Math.max(
+    0,
+    Math.min(durationDays, Math.ceil(elapsedMs / (1000 * 60 * 60 * 24))),
+  );
+
+  // Percentage elapsed (capped at 100)
+  const percentElapsed = Math.min(
+    100,
+    Math.round((elapsedDays / durationDays) * 100),
+  );
+
+  return {
+    days: durationDays,
+    elapsed: elapsedDays,
+    remaining: Math.max(0, durationDays - elapsedDays),
+    percentElapsed: percentElapsed,
+    hasStarted: elapsedMs >= 0,
+    isComplete: elapsedDays >= durationDays,
+  };
+}
+
 // Check if a section represents "done" tasks
 function isDoneSection(section) {
   if (!section) return false;
@@ -317,7 +438,9 @@ function isDoneSection(section) {
 function isOverdue(dueDate, section, today) {
   if (!dueDate) return false;
   if (isDoneSection(section)) return false;
-  return new Date(dueDate) < today;
+  const dueDateUTC = normalizeToUTC(new Date(dueDate));
+  const todayUTC = normalizeToUTC(today);
+  return dueDateUTC < todayUTC;
 }
 
 function daysUntil(dueDate, today) {
@@ -390,8 +513,11 @@ function calculateStats(tasks, sections, sectionNames) {
 }
 
 // Export helper functions for testing
+module.exports.normalizeToUTC = normalizeToUTC;
+module.exports.validateRecords = validateRecords;
 module.exports.isDoneSection = isDoneSection;
 module.exports.isOverdue = isOverdue;
 module.exports.priorityOrder = priorityOrder;
 module.exports.processRecords = processRecords;
 module.exports.calculateStats = calculateStats;
+module.exports.calculateDuration = calculateDuration;

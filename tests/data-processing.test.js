@@ -4,7 +4,15 @@ const { parse } = require("csv-parse/sync");
 
 // Import processing functions from the actual source
 const tasksModule = require("../src/_data/tasks.js");
-const { isDoneSection, isOverdue, priorityOrder, processRecords } = tasksModule;
+const {
+  normalizeToUTC,
+  validateRecords,
+  isDoneSection,
+  isOverdue,
+  priorityOrder,
+  processRecords,
+  calculateDuration,
+} = tasksModule;
 
 // Load test fixture
 function loadTestData() {
@@ -16,6 +24,27 @@ function loadTestData() {
     bom: true,
   });
 }
+
+describe("normalizeToUTC", () => {
+  test("normalizes a date to UTC midnight", () => {
+    const date = new Date("2026-01-15T14:30:00Z");
+    const normalized = normalizeToUTC(date);
+    expect(normalized.getUTCHours()).toBe(0);
+    expect(normalized.getUTCMinutes()).toBe(0);
+    expect(normalized.getUTCSeconds()).toBe(0);
+    expect(normalized.getUTCFullYear()).toBe(2026);
+    expect(normalized.getUTCMonth()).toBe(0); // January
+    expect(normalized.getUTCDate()).toBe(15);
+  });
+
+  test("preserves the UTC date regardless of input time", () => {
+    const date1 = new Date("2026-01-15T00:00:00Z");
+    const date2 = new Date("2026-01-15T23:59:59Z");
+    const normalized1 = normalizeToUTC(date1);
+    const normalized2 = normalizeToUTC(date2);
+    expect(normalized1.getTime()).toBe(normalized2.getTime());
+  });
+});
 
 describe("isDoneSection", () => {
   test('recognizes "Done" section', () => {
@@ -66,6 +95,29 @@ describe("isOverdue", () => {
   test("returns false for null/empty due dates", () => {
     expect(isOverdue(null, "To do", today)).toBe(false);
     expect(isOverdue("", "To do", today)).toBe(false);
+  });
+
+  test("returns false when due date equals today (same day not overdue)", () => {
+    // Task due today should NOT be overdue, regardless of time
+    const todayMorning = new Date("2026-01-15T08:00:00Z");
+    const todayEvening = new Date("2026-01-15T20:00:00Z");
+    expect(isOverdue("2026-01-15", "To do", todayMorning)).toBe(false);
+    expect(isOverdue("2026-01-15", "To do", todayEvening)).toBe(false);
+  });
+
+  test("uses UTC comparison for timezone consistency", () => {
+    // Create dates that might be different days in different timezones
+    // but should be treated consistently with UTC comparison
+    const todayUTC = new Date("2026-01-15T00:00:00Z");
+    const todayLateUTC = new Date("2026-01-15T23:59:59Z");
+
+    // Due date is 2026-01-14 - should be overdue on 2026-01-15
+    expect(isOverdue("2026-01-14", "To do", todayUTC)).toBe(true);
+    expect(isOverdue("2026-01-14", "To do", todayLateUTC)).toBe(true);
+
+    // Due date is 2026-01-15 - should NOT be overdue on 2026-01-15
+    expect(isOverdue("2026-01-15", "To do", todayUTC)).toBe(false);
+    expect(isOverdue("2026-01-15", "To do", todayLateUTC)).toBe(false);
   });
 });
 
@@ -437,5 +489,132 @@ describe("Tags, Parent Task, and Notes", () => {
       "Parent B",
       "Sub B1",
     ]);
+  });
+});
+
+describe("validateRecords", () => {
+  beforeEach(() => {
+    // Suppress console.warn during tests
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test("returns warning for missing required Name field", () => {
+    const records = [
+      { "Task ID": "1", Name: "", "Section/Column": "To do" },
+      { "Task ID": "2", Name: "Valid Task", "Section/Column": "To do" },
+    ];
+    const warnings = validateRecords(records);
+    expect(warnings).toContain('Row 2: Missing required field "Name"');
+  });
+
+  test("returns warning for missing recommended columns", () => {
+    const records = [{ "Task ID": "1", Name: "Test Task" }];
+    const warnings = validateRecords(records);
+    expect(warnings).toContain(
+      'CSV missing recommended column "Section/Column"',
+    );
+    expect(warnings).toContain('CSV missing recommended column "Assignee"');
+    expect(warnings).toContain('CSV missing recommended column "Due Date"');
+  });
+
+  test("returns empty array for valid records with all fields", () => {
+    const records = [
+      {
+        Name: "Valid Task",
+        "Section/Column": "To do",
+        Assignee: "Alice",
+        "Due Date": "2026-01-20",
+      },
+    ];
+    const warnings = validateRecords(records);
+    expect(warnings).toEqual([]);
+  });
+
+  test("returns empty array for empty records", () => {
+    const warnings = validateRecords([]);
+    expect(warnings).toEqual([]);
+  });
+
+  test("logs warnings to console when issues found", () => {
+    const records = [{ "Task ID": "1", Name: "" }];
+    validateRecords(records);
+    expect(console.warn).toHaveBeenCalled();
+  });
+});
+
+describe("calculateDuration", () => {
+  test("calculates days inclusive start exclusive end", () => {
+    const today = new Date("2026-01-10");
+    const result = calculateDuration("2026-01-01", "2026-01-05", today);
+    expect(result.days).toBe(4); // Jan 1, 2, 3, 4 (not 5)
+  });
+
+  test("calculates elapsed days", () => {
+    const today = new Date("2026-01-03");
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.elapsed).toBe(2); // Jan 1, 2
+    expect(result.percentElapsed).toBe(22); // 2/9 ≈ 22%
+  });
+
+  test("caps elapsed at duration", () => {
+    const today = new Date("2026-01-20"); // past due
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.elapsed).toBe(9);
+    expect(result.percentElapsed).toBe(100);
+  });
+
+  test("returns null when no dates", () => {
+    const today = new Date("2026-01-10");
+    expect(calculateDuration(null, null, today)).toBeNull();
+  });
+
+  test("handles start-only tasks", () => {
+    const today = new Date("2026-01-05");
+    const result = calculateDuration("2026-01-01", null, today);
+    expect(result.days).toBe(1); // single day
+  });
+
+  test("handles due-only tasks", () => {
+    const today = new Date("2026-01-05");
+    const result = calculateDuration(null, "2026-01-10", today);
+    expect(result.days).toBe(1); // single day (due only = single day)
+    expect(result.hasStarted).toBe(false); // today is before effective start (which is due date)
+  });
+
+  test("hasStarted is false for future tasks", () => {
+    const today = new Date("2026-01-01");
+    const result = calculateDuration("2026-01-10", "2026-01-20", today);
+    expect(result.hasStarted).toBe(false);
+    expect(result.elapsed).toBe(0);
+    expect(result.percentElapsed).toBe(0);
+  });
+
+  test("hasStarted is true when today is after start", () => {
+    const today = new Date("2026-01-05");
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.hasStarted).toBe(true);
+  });
+
+  test("isComplete is true when elapsed equals duration", () => {
+    const today = new Date("2026-01-15");
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.isComplete).toBe(true);
+  });
+
+  test("remaining days calculated correctly", () => {
+    const today = new Date("2026-01-05");
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.remaining).toBe(result.days - result.elapsed);
+    expect(result.remaining).toBe(5); // 9 - 4 = 5
+  });
+
+  test("remaining is zero when past due", () => {
+    const today = new Date("2026-01-20");
+    const result = calculateDuration("2026-01-01", "2026-01-10", today);
+    expect(result.remaining).toBe(0);
   });
 });

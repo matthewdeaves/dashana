@@ -1,37 +1,39 @@
 <div class="task-card {% if task.isDone %}is-done{% endif %} {% if task.isOverdue %}is-overdue{% endif %} {% if task.isSubtask %}is-subtask{% endif %}">
   <div class="card-header">
     <span class="task-name">{{ task.name }}</span>
-    {% if task.notes %}<span class="card-notes-icon" title="{{ task.notes }}">📝</span>{% endif %}
-    {% if task.isDone %}
-      <span class="completion-label completion-done">Done</span>
-    {% else %}
-      <span class="completion-label completion-open">Open</span>
+    {% if config.cardItems.notes and task.notes %}<span class="card-notes-icon" title="{{ task.notes }}">📝</span>{% endif %}
+    {% if config.cardItems.progress %}
+      {% if task.isDone %}
+        <span class="completion-label completion-done">Done</span>
+      {% else %}
+        <span class="completion-label completion-open">Open</span>
+      {% endif %}
     {% endif %}
   </div>
 
   <div class="card-meta">
-    {% if task.assignee and task.assignee != 'Unassigned' %}
+    {% if config.cardItems.assignee and task.assignee and task.assignee != 'Unassigned' %}
       <span class="task-assignee">{{ task.assignee }}</span>
     {% endif %}
 
-    {% if task.dueDate %}
+    {% if config.cardItems.due and task.dueDate %}
       <span class="task-due {% if task.isOverdue %}overdue{% endif %}">
         {{ task.dueDate }}
       </span>
     {% endif %}
 
-    {% if task.status %}
-      <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+    {% if config.cardItems.status and task.status %}
+      <span class="task-status status-{{ task.status | lower | replace(' ', '-') }}">{% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %} {{ task.status }}</span>
     {% endif %}
   </div>
 
-  {% if task.priority and not task.isDone %}
+  {% if config.cardItems.priority and task.priority and not task.isDone %}
     <span class="priority-badge priority-{{ task.priority | lower }}">
       {{ task.priority }}
     </span>
   {% endif %}
 
-  {% if task.tags.length > 0 %}
+  {% if config.cardItems.tags and task.tags.length > 0 %}
     <div class="card-tags">
       {% for tag in task.tags %}
         <span class="tag-badge">{{ tag }}</span>
@@ -39,11 +41,11 @@
     </div>
   {% endif %}
 
-  {% if task.parentTask %}
+  {% if config.cardItems.parent and task.parentTask %}
     <div class="card-parent">↳ {{ task.parentTask }}</div>
   {% endif %}
 
-  {% if task.customFields and tasks.customFieldNames.length > 0 %}
+  {% if config.cardItems.custom and task.customFields and tasks.customFieldNames.length > 0 %}
     <div class="card-custom-fields">
       {% for fieldName in tasks.customFieldNames %}
         {% if task.customFields[fieldName] %}

@@ -6,6 +6,18 @@ set -e
 
 echo "Building Dashana versions..."
 
+# Verify we're in a git repository
+if ! git rev-parse --git-dir > /dev/null 2>&1; then
+  echo "Error: Not a git repository"
+  exit 1
+fi
+
+# Verify data directory exists
+if [ ! -d "data" ]; then
+  echo "Error: data/ directory not found"
+  exit 1
+fi
+
 # Create output directory
 rm -rf _site
 mkdir -p _site
@@ -51,7 +63,10 @@ for TAG in $TAGS; do
   echo "Building version: $DATE (from tag: $TAG)"
 
   # Checkout the tagged version
-  git checkout "$TAG" -- data/project.csv 2>/dev/null || continue
+  if ! git checkout "$TAG" -- data/project.csv 2>/dev/null; then
+    echo "  Skipping $TAG: Could not checkout data/project.csv from this tag"
+    continue
+  fi
 
   # Build with version prefix
   DASHANA_VERSION="$DATE" npm run build

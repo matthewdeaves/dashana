@@ -48,11 +48,13 @@
       var filterState = localStorage.getItem('filterOpenOnly');
       if (filterState === 'true') {
         filterToggle.classList.add('show-open-only');
+        filterToggle.setAttribute('aria-pressed', 'true');
         document.body.classList.add('show-open-only-active');
       }
 
       filterToggle.addEventListener('click', function() {
         var isFiltered = filterToggle.classList.toggle('show-open-only');
+        filterToggle.setAttribute('aria-pressed', isFiltered);
         document.body.classList.toggle('show-open-only-active', isFiltered);
         localStorage.setItem('filterOpenOnly', isFiltered);
       });

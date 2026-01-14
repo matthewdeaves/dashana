@@ -4,6 +4,12 @@ title: Tasks
 permalink: /tasks/
 ---
 
+{% if not config.tabs.tasks %}
+<div class="page-disabled">
+  <p>This view has been disabled in the configuration.</p>
+  <a href="{{ pathPrefix }}/">Return to Dashboard</a>
+</div>
+{% else %}
 <div class="tasks-page">
   <div class="page-header">
     <div class="page-header-top">
@@ -17,25 +23,30 @@ permalink: /tasks/
     <table class="task-table">
       <thead>
         <tr>
-          <th class="col-name">Name</th>
-          <th class="col-completion">Progress</th>
-          <th class="col-section">Section</th>
-          <th class="col-assignee">Assignee</th>
-          <th class="col-due">Due Date</th>
-          <th class="col-priority">Priority</th>
-          <th class="col-status">Status</th>
-          <th class="col-tags">Tags</th>
-          <th class="col-parent">Parent</th>
-          <th class="col-notes">Notes</th>
-          {% for fieldName in tasks.customFieldNames %}
-          <th class="col-custom">{{ fieldName }}</th>
-          {% endfor %}
+          {% if config.tasksColumns.name %}<th scope="col" class="col-name">Name</th>{% endif %}
+          {% if config.tasksColumns.progress %}<th scope="col" class="col-completion">Progress</th>{% endif %}
+          {% if config.tasksColumns.section %}<th scope="col" class="col-section">Section</th>{% endif %}
+          {% if config.tasksColumns.assignee %}<th scope="col" class="col-assignee">Assignee</th>{% endif %}
+          {% if config.tasksColumns.due %}<th scope="col" class="col-due">Due Date</th>{% endif %}
+          {% if config.tasksColumns.priority %}<th scope="col" class="col-priority">Priority</th>{% endif %}
+          {% if config.tasksColumns.status %}<th scope="col" class="col-status">Status</th>{% endif %}
+          {% if config.tasksColumns.tags %}<th scope="col" class="col-tags">Tags</th>{% endif %}
+          {% if config.tasksColumns.parent %}<th scope="col" class="col-parent">Parent</th>{% endif %}
+          {% if config.tasksColumns.notes %}<th scope="col" class="col-notes">Notes</th>{% endif %}
+          {% if config.tasksColumns.custom %}
+            {% for fieldName in tasks.customFieldNames %}
+            <th scope="col" class="col-custom">{{ fieldName }}</th>
+            {% endfor %}
+          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for task in tasks.all %}
         <tr class="{% if task.isOverdue %}row-overdue{% endif %} {% if task.isDone %}row-done{% endif %} {% if task.isSubtask %}row-subtask{% endif %}">
+          {% if config.tasksColumns.name %}
           <td class="col-name">{% if task.isSubtask %}<span class="subtask-indent">↳</span> {% endif %}{{ task.name }}</td>
+          {% endif %}
+          {% if config.tasksColumns.progress %}
           <td class="col-completion">
             {% if task.isDone %}
               <span class="completion-label completion-done">Done</span>
@@ -43,13 +54,21 @@ permalink: /tasks/
               <span class="completion-label completion-open">Open</span>
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.section %}
           <td class="col-section">
             <span class="section-badge">{{ task.section }}</span>
           </td>
+          {% endif %}
+          {% if config.tasksColumns.assignee %}
           <td class="col-assignee">{{ task.assignee if task.assignee != 'Unassigned' else '—' }}</td>
+          {% endif %}
+          {% if config.tasksColumns.due %}
           <td class="col-due {% if task.isOverdue %}overdue{% endif %}">
             {{ task.dueDate if task.dueDate else '—' }}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.priority %}
           <td class="col-priority">
             {% if task.priority %}
               <span class="priority-badge priority-{{ task.priority | lower }}">{{ task.priority }}</span>
@@ -57,13 +76,17 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.status %}
           <td class="col-status">
             {% if task.status %}
-              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{{ task.status }}</span>
+              <span class="status-badge status-{{ task.status | lower | replace(' ', '-') }}">{% if task.status == 'On track' %}●{% elif task.status == 'At risk' %}▲{% elif task.status == 'Off track' %}■{% endif %} {{ task.status }}</span>
             {% else %}
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.tags %}
           <td class="col-tags">
             {% if task.tags.length > 0 %}
               {% for tag in task.tags %}
@@ -73,6 +96,8 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.parent %}
           <td class="col-parent">
             {% if task.parentTask %}
               <span class="parent-ref">{{ task.parentTask }}</span>
@@ -80,6 +105,8 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
+          {% endif %}
+          {% if config.tasksColumns.notes %}
           <td class="col-notes">
             {% if task.notes %}
               <span class="notes-icon" title="{{ task.notes }}">📝</span>
@@ -87,18 +114,22 @@ permalink: /tasks/
               —
             {% endif %}
           </td>
-          {% for fieldName in tasks.customFieldNames %}
-          <td class="col-custom">
-            {% if task.customFields and task.customFields[fieldName] %}
-              <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
-            {% else %}
-              —
-            {% endif %}
-          </td>
-          {% endfor %}
+          {% endif %}
+          {% if config.tasksColumns.custom %}
+            {% for fieldName in tasks.customFieldNames %}
+            <td class="col-custom">
+              {% if task.customFields and task.customFields[fieldName] %}
+                <span class="custom-field-value">{{ task.customFields[fieldName] }}</span>
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            {% endfor %}
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+{% endif %}

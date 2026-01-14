@@ -1,34 +1,34 @@
-/* Light theme (default) */
+/* Light theme (default) - REFINED for reduced eye strain */
 :root {
-  /* Base colors */
-  --color-bg: #ffffff;
-  --color-bg-alt: #f9fafb;
-  --color-bg-tertiary: #f0f0f0;
-  --color-text: #333333;
-  --color-text-muted: #666666;
-  --color-border: #e5e5e5;
-  --color-accent: #0066cc;
-  --color-accent-hover: #0052a3;
+  /* Base colors - warmer, softer whites */
+  --color-bg: #fafafa; /* Was #ffffff - soft off-white */
+  --color-bg-alt: #f5f5f4; /* Was #f9fafb - warm light gray */
+  --color-bg-tertiary: #e7e5e4; /* Was #f0f0f0 - stone gray */
+  --color-text: #292524; /* Was #333333 - warm dark */
+  --color-text-muted: #78716c; /* Was #666666 - stone muted */
+  --color-border: #d6d3d1; /* Was #e5e5e5 - visible but soft */
+  --color-accent: #0066cc; /* Keep - good contrast */
+  --color-accent-hover: #0052a3; /* Keep */
 
-  /* Status colors */
-  --color-on-track: #22c55e;
-  --color-on-track-bg: #f0fdf4;
-  --color-at-risk: #eab308;
-  --color-at-risk-bg: #fefce8;
-  --color-off-track: #ef4444;
-  --color-off-track-bg: #fef2f2;
+  /* Status colors - slightly muted for softer appearance */
+  --color-on-track: #16a34a; /* Was #22c55e - slightly deeper green */
+  --color-on-track-bg: #f0fdf4; /* Keep */
+  --color-at-risk: #ca8a04; /* Was #eab308 - deeper amber */
+  --color-at-risk-bg: #fefce8; /* Keep */
+  --color-off-track: #dc2626; /* Was #ef4444 - slightly deeper red */
+  --color-off-track-bg: #fee2e2; /* Was #fef2f2 - more visible red */
 
-  /* Priority colors */
-  --color-priority-high: #ef4444;
-  --color-priority-medium: #a16207;
-  --color-priority-low: #15803d;
+  /* Priority colors - match status adjustments */
+  --color-priority-high: #dc2626; /* Was #ef4444 */
+  --color-priority-medium: #a16207; /* Keep - already warm */
+  --color-priority-low: #15803d; /* Keep */
 
   /* Component colors */
-  --color-card-bg: #ffffff;
+  --color-card-bg: #fafafa; /* Match --color-bg */
   --color-card-border: var(--color-border);
-  --color-table-header: #f8f9fa;
+  --color-table-header: #f5f5f4; /* Match --color-bg-alt */
   --color-table-row-alt: rgba(0, 0, 0, 0.02);
-  --color-table-hover: #f0f0f0;
+  --color-table-hover: #e7e5e4; /* Match --color-bg-tertiary */
 }
 
 /* Dark theme - class-based (set by JS) */
@@ -472,6 +472,57 @@ html.dark .theme-icon-light {
   font-size: 0.875rem;
   font-style: italic;
   margin: 0;
+}
+
+/* Error Banner */
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid var(--color-off-track);
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  margin: 2rem;
+  color: #991b1b;
+}
+
+.error-banner strong {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.error-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #7f1d1d;
+}
+
+html.dark .error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+html.dark .error-hint {
+  color: #f87171;
+}
+
+/* Disabled Page */
+.page-disabled {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-text-muted);
+}
+
+.page-disabled p {
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+.page-disabled a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.page-disabled a:hover {
+  text-decoration: underline;
 }
 
 /* ========================================
@@ -1114,26 +1165,59 @@ html.dark .theme-icon-light {
   width: 100px;
 }
 
-/* Timeline Bar */
-.timeline-bar-container {
+/* Timeline Duration Bar (refactored) */
+.duration-bar-container {
   position: relative;
-  height: 20px;
+  height: 24px;
   background: var(--color-bg-tertiary);
-  border-radius: 3px;
+  border-radius: 4px;
   border: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
-.timeline-bar {
+.duration-bar {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  background: var(--color-accent);
-  border-radius: 2px;
-  min-width: 4px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--color-border);
+  border-radius: 3px 0 0 3px;
+  transition: width 0.3s ease;
 }
 
-.timeline-bar.overdue {
+.duration-bar.in-progress {
+  background: var(--color-accent);
+}
+
+.duration-bar.done {
+  background: var(--color-on-track);
+}
+
+.duration-bar.overdue {
   background: var(--color-off-track);
+}
+
+.duration-bar.not-started {
+  width: 0 !important;
+}
+
+.duration-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+/* Ensure text is readable on filled bars */
+.duration-bar.done + .duration-text,
+.duration-bar.overdue + .duration-text {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Timeline hover */
@@ -1141,7 +1225,7 @@ html.dark .theme-icon-light {
   background: var(--color-bg-alt);
 }
 
-.timeline-table tbody tr:hover .timeline-bar-container {
+.timeline-table tbody tr:hover .duration-bar-container {
   background: var(--color-bg);
   border-color: var(--color-accent);
 }
@@ -1171,11 +1255,6 @@ html.dark .theme-icon-light {
   font-size: 0.75rem;
   color: var(--color-text-muted);
   font-style: italic;
-}
-
-.timeline-bar.done {
-  background: var(--color-on-track);
-  opacity: 0.6;
 }
 
 /* Empty state */
@@ -1358,6 +1437,19 @@ button:focus,
 .version-link-card:focus {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* Visually Hidden (for screen readers) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Better link styles */

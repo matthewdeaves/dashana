@@ -5,10 +5,18 @@
   </div>
 
   <nav class="main-nav">
-    <a href="{{ pathPrefix }}/" class="nav-link {% if page.url == '/' or page.url == pathPrefix + '/' %}active{% endif %}">Dashboard</a>
-    <a href="{{ pathPrefix }}/board/" class="nav-link {% if '/board/' in page.url %}active{% endif %}">Board</a>
-    <a href="{{ pathPrefix }}/tasks/" class="nav-link {% if '/tasks/' in page.url %}active{% endif %}">Tasks</a>
-    <a href="{{ pathPrefix }}/timeline/" class="nav-link {% if '/timeline/' in page.url %}active{% endif %}">Timeline</a>
+    {% if config.tabs.dashboard %}
+      <a href="{{ pathPrefix }}/" class="nav-link {% if page.url == '/' or page.url == pathPrefix + '/' %}active{% endif %}">Dashboard</a>
+    {% endif %}
+    {% if config.tabs.board %}
+      <a href="{{ pathPrefix }}/board/" class="nav-link {% if '/board/' in page.url %}active{% endif %}">Board</a>
+    {% endif %}
+    {% if config.tabs.tasks %}
+      <a href="{{ pathPrefix }}/tasks/" class="nav-link {% if '/tasks/' in page.url %}active{% endif %}">Tasks</a>
+    {% endif %}
+    {% if config.tabs.timeline %}
+      <a href="{{ pathPrefix }}/timeline/" class="nav-link {% if '/timeline/' in page.url %}active{% endif %}">Timeline</a>
+    {% endif %}
   </nav>
 
   <div class="header-actions">

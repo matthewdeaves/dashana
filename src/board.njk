@@ -4,6 +4,12 @@ title: Board
 permalink: /board/
 ---
 
+{% if not config.tabs.board %}
+<div class="page-disabled">
+  <p>This view has been disabled in the configuration.</p>
+  <a href="{{ pathPrefix }}/">Return to Dashboard</a>
+</div>
+{% else %}
 <div class="board-page">
   <div class="page-header">
     <div class="page-header-top">
@@ -19,3 +25,4 @@ permalink: /board/
     {% endfor %}
   </div>
 </div>
+{% endif %}

@@ -5,6 +5,17 @@ module.exports = function (eleventyConfig) {
   // Build date for display in header (formatted as YYYY-MM-DD)
   const buildDate = new Date().toISOString().split("T")[0];
 
+  // Load config to get siteBase
+  const config = require("./src/_data/config.js")();
+  // Auto-detect siteBase from GITHUB_REPOSITORY if not explicitly set
+  // GITHUB_REPOSITORY is "owner/repo", we extract "repo" for the path
+  let siteBase = config.siteBase;
+  if (!siteBase && process.env.GITHUB_REPOSITORY) {
+    const repo = process.env.GITHUB_REPOSITORY.split("/")[1];
+    siteBase = `/${repo}`;
+  }
+  siteBase = siteBase || "";
+
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addWatchTarget("dashana.config");
 
@@ -20,12 +31,12 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addGlobalData("version", version);
   eleventyConfig.addGlobalData("buildDate", buildDate);
 
-  // Adjust paths if building a version
+  // Build pathPrefix: siteBase + optional version
+  let pathPrefix = siteBase;
   if (version) {
-    eleventyConfig.addGlobalData("pathPrefix", `/${version}`);
-  } else {
-    eleventyConfig.addGlobalData("pathPrefix", "");
+    pathPrefix = `${siteBase}/${version}`;
   }
+  eleventyConfig.addGlobalData("pathPrefix", pathPrefix);
 
   return {
     dir: {

@@ -1,8 +1,18 @@
 # Phase 5: Task List Page
 
+> **Status:** ✅ COMPLETE (with enhancements)
 > **Goal:** Create the task list table view with sorting and badges.
 > **Sessions:** 1
 > **Prerequisites:** Phase 4 complete
+>
+> **Enhancements Added:**
+> - Progress column (Open/Done labels)
+> - Tags column
+> - Parent task column
+> - Notes column (icon with tooltip)
+> - Custom fields columns
+> - Filter toggle
+> - Subtask indentation
 
 ## Session Scope
 
@@ -215,14 +225,14 @@ Add status badge styles (may reuse from board):
 
 ## Phase 5 Completion Checklist
 
-- [ ] Task list page loads at /tasks/
-- [ ] All tasks displayed in table
-- [ ] Sorting correct (section → priority)
-- [ ] All badges styled correctly
-- [ ] Alternating rows work
-- [ ] Overdue highlighting works
-- [ ] Table scrolls on mobile
-- [ ] Ready for Phase 6 (Timeline)
+- [x] Task list page loads at /tasks/
+- [x] All tasks displayed in table
+- [x] Sorting correct (section → priority)
+- [x] All badges styled correctly
+- [x] Alternating rows work
+- [x] Overdue highlighting works
+- [x] Table scrolls on mobile
+- [x] Ready for Phase 6 (Timeline)
 
 ## How to Start This Phase
 

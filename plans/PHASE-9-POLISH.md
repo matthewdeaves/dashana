@@ -1,8 +1,13 @@
 # Phase 9: Polish
 
+> **Status:** ✅ COMPLETE
 > **Goal:** Add responsive design, dark mode, print styles, and final refinements.
 > **Sessions:** 2
 > **Prerequisites:** Phase 8 complete (deployment working)
+>
+> **Enhancements Added:**
+> - Theme toggle button with JS persistence
+> - System preference fallback for dark mode
 
 ## Session Scope
 
@@ -571,13 +576,13 @@ html {
 
 ## Phase 9 Completion Checklist
 
-- [ ] Light mode looks correct
-- [ ] Dark mode works with system preference
-- [ ] Print stylesheet produces clean output
-- [ ] Responsive at all screen sizes
-- [ ] Transitions smooth
-- [ ] Accessibility basics covered
-- [ ] Ready for production use!
+- [x] Light mode looks correct
+- [x] Dark mode works with system preference
+- [x] Print stylesheet produces clean output
+- [x] Responsive at all screen sizes
+- [x] Transitions smooth
+- [x] Accessibility basics covered
+- [x] Ready for production use!
 
 ## How to Start This Phase
 

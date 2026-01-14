@@ -1,8 +1,16 @@
 # Phase 4: Kanban Board Page
 
+> **Status:** ✅ COMPLETE (with enhancements)
 > **Goal:** Create the Kanban board view with task cards in columns.
 > **Sessions:** 1-2
 > **Prerequisites:** Phase 3 complete (dashboard working)
+>
+> **Enhancements Added:**
+> - Dynamic columns (uses sectionNames, not hardcoded 5 columns)
+> - Filter toggle for open/all tasks
+> - Tags display on cards
+> - Parent task indicator on cards
+> - Custom fields display on cards
 
 ## Session Scope
 
@@ -298,14 +306,14 @@ Add responsive styles for smaller screens:
 
 ## Phase 4 Completion Checklist
 
-- [ ] Board page loads at /board/
-- [ ] All 5 columns display
-- [ ] Task cards show in correct columns
-- [ ] Cards display all required info
-- [ ] Status colors work
-- [ ] Priority badges work
-- [ ] Overdue highlighting works
-- [ ] Ready for Phase 5 (Task List)
+- [x] Board page loads at /board/
+- [x] Dynamic columns display (not limited to 5)
+- [x] Task cards show in correct columns
+- [x] Cards display all required info
+- [x] Status colors work
+- [x] Priority badges work
+- [x] Overdue highlighting works
+- [x] Ready for Phase 5 (Task List)
 
 ## How to Start This Phase
 

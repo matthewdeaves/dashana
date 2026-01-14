@@ -1,8 +1,15 @@
 # Phase 2: Data Layer
 
+> **Status:** ✅ COMPLETE (with enhancements beyond plan)
 > **Goal:** Parse CSV data and config, provide computed fields to templates.
 > **Sessions:** 1
 > **Prerequisites:** Phase 1 complete
+>
+> **Enhancements Added:**
+> - Custom field support (auto-discovered from CSV)
+> - Tags parsing and display
+> - Parent task relationships and subtask handling
+> - Section inheritance for subtasks
 
 ## Session Scope
 
@@ -73,8 +80,8 @@ module.exports = function() {
 ```
 
 **Acceptance:**
-- [ ] Config loads in templates as `{{ config.projectName }}`
-- [ ] Falls back to defaults if file missing
+- [x] Config loads in templates as `{{ config.projectName }}`
+- [x] Falls back to defaults if file missing
 
 ---
 
@@ -107,8 +114,8 @@ module.exports = function() {
 ```
 
 **Acceptance:**
-- [ ] CSV parses without errors
-- [ ] Records accessible in templates
+- [x] CSV parses without errors
+- [x] Records accessible in templates
 
 ---
 
@@ -203,11 +210,11 @@ function priorityOrder(priority) {
 ```
 
 **Acceptance:**
-- [ ] `tasks.all` contains all tasks with computed fields
-- [ ] `tasks.sections` groups tasks by column dynamically
-- [ ] `tasks.sectionNames` provides ordered array for iteration
-- [ ] `isDone` correctly identifies completed tasks by section name
-- [ ] Works with ANY section names, not just hardcoded ones
+- [x] `tasks.all` contains all tasks with computed fields
+- [x] `tasks.sections` groups tasks by column dynamically
+- [x] `tasks.sectionNames` provides ordered array for iteration
+- [x] `isDone` correctly identifies completed tasks by section name
+- [x] Works with ANY section names, not just hardcoded ones
 
 ---
 
@@ -263,11 +270,11 @@ function calculateStats(tasks, sections, sectionNames) {
 ```
 
 **Acceptance:**
-- [ ] `tasks.stats.total` returns correct count
-- [ ] `tasks.stats.completionPercent` calculates correctly
-- [ ] `byStatus` contains only statuses that exist in data
-- [ ] `byPriority` contains only priorities that exist in data
-- [ ] Works with ANY field values, not hardcoded ones
+- [x] `tasks.stats.total` returns correct count
+- [x] `tasks.stats.completionPercent` calculates correctly
+- [x] `byStatus` contains only statuses that exist in data
+- [x] `byPriority` contains only priorities that exist in data
+- [x] Works with ANY field values, not hardcoded ones
 
 ---
 
@@ -321,15 +328,15 @@ Templates should iterate dynamically, never hardcode values:
 
 ## Phase 2 Completion Checklist
 
-- [ ] Config loads from `dashana.config`
-- [ ] CSV parses all fields correctly
-- [ ] Sections discovered dynamically from data
-- [ ] "Done" sections detected by pattern matching
-- [ ] Status/priority values collected dynamically
-- [ ] Computed fields work (isOverdue, isDone, etc.)
-- [ ] Stats calculate correctly for any data
-- [ ] Data accessible in templates
-- [ ] Ready for Phase 3 (Dashboard)
+- [x] Config loads from `dashana.config`
+- [x] CSV parses all fields correctly
+- [x] Sections discovered dynamically from data
+- [x] "Done" sections detected by pattern matching
+- [x] Status/priority values collected dynamically
+- [x] Computed fields work (isOverdue, isDone, etc.)
+- [x] Stats calculate correctly for any data
+- [x] Data accessible in templates
+- [x] Ready for Phase 3 (Dashboard)
 
 ## How to Start This Phase
 

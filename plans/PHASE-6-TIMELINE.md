@@ -1,8 +1,19 @@
 # Phase 6: Timeline Page
 
+> **Status:** ✅ COMPLETE (with enhancements)
 > **Goal:** Create timeline view showing task date ranges as visual bars.
 > **Sessions:** 1
 > **Prerequisites:** Phase 5 complete
+>
+> **Enhancements Added:**
+> - Progress column (Open/Done labels)
+> - Section column
+> - Tags column
+> - Parent task column
+> - Notes column
+> - Custom fields columns
+> - Filter toggle
+> - Subtask indentation
 
 ## Session Scope
 
@@ -281,13 +292,13 @@ Add finishing touches:
 
 ## Phase 6 Completion Checklist
 
-- [ ] Timeline page loads at /timeline/
-- [ ] Tasks sorted by date
-- [ ] Visual bars show date ranges
-- [ ] Bars positioned correctly relative to project span
-- [ ] Overdue highlighting works
-- [ ] Empty state displays when appropriate
-- [ ] Ready for Phase 7 (Versioning)
+- [x] Timeline page loads at /timeline/
+- [x] Tasks sorted by date
+- [x] Visual bars show date ranges
+- [x] Bars positioned correctly relative to project span
+- [x] Overdue highlighting works
+- [x] Empty state displays when appropriate
+- [x] Ready for Phase 7 (Versioning)
 
 ## How to Start This Phase
 

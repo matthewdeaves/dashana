@@ -1,9 +1,18 @@
 # Phase 10: Robustness & Code Quality
 
+> **Status:** 🚧 NOT STARTED
 > **Goal:** Improve error handling, date consistency, accessibility, code quality tooling, display configuration, timeline UX, and visual comfort.
 > **Sessions:** 6
 > **Prerequisites:** Phases 1-9 complete (working site)
 > **Last Updated:** 2026-01-14 (verified against current codebase)
+>
+> **Status Summary:**
+> - Session 10-A (Biome): ❌ NOT DONE
+> - Session 10-B (Date/Error handling): ❌ NOT DONE
+> - Session 10-C (Accessibility): ❌ NOT DONE (filter has aria-label but not aria-pressed, tables lack scope)
+> - Session 10-D (Display configuration): ❌ NOT DONE
+> - Session 10-E (Duration bar refactor): ❌ NOT DONE
+> - Session 10-F (Light theme refinement): ❌ NOT DONE
 
 ## Scope
 
@@ -691,6 +700,11 @@ module.exports = function() {
 - [ ] Default values are all true (shown)
 - [ ] Setting `SHOW_BOARD=NO` results in `config.tabs.board === false`
 - [ ] `npm run build` succeeds with unchanged config
+- [ ] Add unit tests for config parser:
+  - [ ] Test: `parseYesNo('YES')` returns true
+  - [ ] Test: `parseYesNo('no')` returns false (case-insensitive)
+  - [ ] Test: `parseYesNo('TRUE')` and `parseYesNo('1')` return true
+  - [ ] Test: Missing config key uses default value (all true)
 
 ---
 
@@ -1260,6 +1274,8 @@ describe('calculateDuration', () => {
 
 ## Session 10-F: Light Theme Refinement
 
+> **Note:** Tasks 10.21 and 10.22 are tightly coupled - verification (10.22) should be performed immediately after implementation (10.21) as part of the same workflow. Consider them a single unit of work.
+
 ### Background
 
 **Problem:** The current light theme uses pure white (#ffffff) backgrounds which can cause eye strain, especially during extended use. The theme needs to be "warmer" and less harsh while still feeling light and professional.
@@ -1363,40 +1379,43 @@ Calculated contrasts (verify with tool like WebAIM):
 
 ## Phase 10 Completion Checklist
 
-**Session 10-A (Code Quality):**
+**Test Coverage Target:** Maintain existing coverage level. New functionality should have corresponding tests.
+
+**Session 10-A (Code Quality): ❌ NOT DONE**
 - [ ] Biome installed and configured
 - [ ] Lint scripts added to package.json
 - [ ] CI pipeline includes lint step
 
-**Session 10-B (Robustness):**
-- [ ] Date handling uses UTC normalization
-- [ ] Error state displays when CSV fails
+**Session 10-B (Robustness): ❌ NOT DONE**
+- [ ] Date handling uses UTC normalization (currently uses setHours(0,0,0,0) which is timezone-dependent)
+- [ ] Error state displays when CSV fails (currently silently returns empty data)
 - [ ] CSV validation logs warnings
 
-**Session 10-C (Accessibility):**
-- [ ] Filter toggle has ARIA attributes
+**Session 10-C (Accessibility): ❌ NOT DONE**
+- [ ] Filter toggle has ARIA attributes (has aria-label but missing aria-pressed)
 - [ ] Tables have scope attributes
 - [ ] Status indicators have distinct shapes (●▲■)
-- [ ] Build script has clear error messages
+- [ ] Build script has clear error messages (currently uses 2>/dev/null || continue)
 
-**Session 10-D (Display Configuration):**
-- [ ] Config parser handles display settings
+**Session 10-D (Display Configuration): ❌ NOT DONE**
+- [ ] Config parser handles display settings (currently only handles PROJECT_NAME, CUSTOMER_NAME, SITE_BASE)
+- [ ] Config parser unit tests pass
 - [ ] Tab visibility controls navigation
 - [ ] Tasks table respects column settings
 - [ ] Timeline table respects column settings
 - [ ] Board cards respect item settings
 - [ ] Example config documented
 
-**Session 10-E (Duration Bar):**
+**Session 10-E (Duration Bar): ❌ NOT DONE**
 - [ ] `calculateDuration` function implemented
 - [ ] Tasks have elapsed/remaining day counts
-- [ ] Duration bar shows progress (left-to-right fill)
+- [ ] Duration bar shows progress (left-to-right fill) - currently shows project-relative position
 - [ ] Day count text displayed inside bar
 - [ ] Color states: gray/blue/green/red
 - [ ] Duration tests pass
 
-**Session 10-F (Light Theme):**
-- [ ] Background shifted from pure white to off-white (#fafafa)
+**Session 10-F (Light Theme): ❌ NOT DONE**
+- [ ] Background shifted from pure white to off-white (#fafafa) - currently uses #ffffff
 - [ ] Borders and muted text use warm stone tones
 - [ ] Status colors slightly deeper for contrast
 - [ ] All text passes WCAG AA contrast (4.5:1)
@@ -1408,6 +1427,7 @@ Calculated contrasts (verify with tool like WebAIM):
 - [ ] Site builds: `npm run build`
 - [ ] Test with modified config (hide some tabs/columns)
 - [ ] Duration bars display correctly on timeline page
+- [ ] Run `npm test -- --coverage` and verify no significant coverage regression
 
 ---
 

@@ -1011,6 +1011,23 @@ html.dark .error-hint {
   border-bottom-color: var(--color-text);
 }
 
+/* Flip table tooltip below when near top of viewport */
+.notes-icon.tooltip-below::after {
+  bottom: auto;
+  top: 100%;
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.notes-icon.tooltip-below::before {
+  bottom: auto;
+  top: 100%;
+  margin-bottom: 0;
+  margin-top: -4px;
+  border-top-color: transparent;
+  border-bottom-color: var(--color-text);
+}
+
 /* Subtasks */
 .row-subtask {
   background: var(--color-bg-alt) !important;
@@ -1129,6 +1146,12 @@ html.dark .error-hint {
 
 .table-container {
   overflow-x: auto;
+}
+
+/* Allow tooltip to escape container when active */
+.table-container:has(.notes-icon:hover),
+.table-container:has(.notes-icon:focus) {
+  overflow: visible;
 }
 
 /* Table */

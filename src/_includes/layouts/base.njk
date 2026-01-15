@@ -66,6 +66,17 @@
         window.location.href = this.value;
       });
     }
+
+    // Tooltip position detection - flip below when not enough room above
+    // Tooltip max-height is 200px + margin, check against viewport top
+    document.querySelectorAll('.notes-icon').forEach(function(icon) {
+      function updatePosition() {
+        var rect = icon.getBoundingClientRect();
+        icon.classList.toggle('tooltip-below', rect.top < 300);
+      }
+      icon.addEventListener('mouseenter', updatePosition);
+      icon.addEventListener('focus', updatePosition);
+    });
   </script>
 </body>
 </html>

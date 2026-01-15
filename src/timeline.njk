@@ -119,7 +119,7 @@ permalink: /timeline/
           {% if config.timelineColumns.notes %}
           <td class="col-notes">
             {% if task.notes %}
-              <span class="notes-icon" title="{{ task.notes }}">📝</span>
+              <span class="notes-icon" data-notes="{{ task.notes }}" tabindex="0" role="button" aria-label="View notes">📝</span>
             {% else %}
               —
             {% endif %}

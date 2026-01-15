@@ -42,7 +42,7 @@
                 </div>
                 {% endif %}
                 {% if config.cardItems.notes and t.notes %}
-                  <span class="card-notes-icon" title="{{ t.notes }}">📝</span>
+                  <span class="card-notes-icon" data-notes="{{ t.notes }}" tabindex="0" role="button" aria-label="View notes">📝</span>
                 {% endif %}
               </div>
             {% endfor %}

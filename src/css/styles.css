@@ -902,19 +902,113 @@ html.dark .error-hint {
   font-style: italic;
 }
 
-/* Notes Icon */
+/* Notes Icon with Touch-Friendly Tooltip */
 .col-notes {
   width: 50px;
   text-align: center;
 }
 
-.notes-icon {
-  cursor: default;
+.notes-icon,
+.card-notes-icon {
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .card-notes-icon {
-  cursor: default;
   margin-left: 0.25rem;
+}
+
+/* Tooltip popup */
+.notes-icon::after,
+.card-notes-icon::after {
+  content: attr(data-notes);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  max-width: 300px;
+  min-width: 150px;
+  width: max-content;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+/* Arrow */
+.notes-icon::before,
+.card-notes-icon::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-text);
+  margin-bottom: -4px;
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+}
+
+/* Show on hover (desktop) */
+.notes-icon:hover::after,
+.notes-icon:hover::before,
+.card-notes-icon:hover::after,
+.card-notes-icon:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Show on focus (keyboard/touch) */
+.notes-icon:focus::after,
+.notes-icon:focus::before,
+.card-notes-icon:focus::after,
+.card-notes-icon:focus::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Remove default focus outline, add custom */
+.notes-icon:focus,
+.card-notes-icon:focus {
+  outline: none;
+  background: var(--color-bg-alt);
+  border-radius: 4px;
+}
+
+/* Position adjustment for card notes (show below instead) */
+.card-notes-icon::after {
+  bottom: auto;
+  top: 100%;
+  margin-bottom: 0;
+  margin-top: 8px;
+}
+
+.card-notes-icon::before {
+  bottom: auto;
+  top: 100%;
+  margin-bottom: 0;
+  margin-top: -4px;
+  border-top-color: transparent;
+  border-bottom-color: var(--color-text);
 }
 
 /* Subtasks */

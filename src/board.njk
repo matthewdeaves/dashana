@@ -1,7 +1,8 @@
 ---
 layout: layouts/base.njk
-title: Board
 permalink: /board/
+eleventyComputed:
+  title: "{{ config.viewNames.board }}"
 ---
 
 {% if not config.tabs.board %}
@@ -13,7 +14,7 @@ permalink: /board/
 <div class="board-page">
   <div class="page-header">
     <div class="page-header-top">
-      <h2>Kanban Board</h2>
+      <h2>{{ config.pageHeadings.board }}</h2>
       <p class="page-subtitle">{{ tasks.stats.total }} tasks across {{ tasks.sectionNames | length }} columns</p>
     </div>
     {% include "components/filter-toggle.njk" %}

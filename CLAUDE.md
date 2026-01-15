@@ -84,6 +84,18 @@ PROJECT_NAME=My Project
 CUSTOMER_NAME=Acme Corp
 SITE_BASE=              # Optional: for subdirectory deployment (e.g., /dashana)
 
+# View Names (navigation buttons and browser tab titles)
+DASHBOARD_NAME=Dashboard
+BOARD_NAME=Board
+TASKS_NAME=Tasks
+TIMELINE_NAME=Timeline
+
+# Page Headings (main h2 on each page)
+DASHBOARD_HEADING=Project Overview
+BOARD_HEADING=Kanban Board
+TASKS_HEADING=Task List
+TIMELINE_HEADING=Timeline
+
 # Tab Visibility (all YES by default, set NO to hide)
 SHOW_DASHBOARD=YES
 SHOW_BOARD=YES

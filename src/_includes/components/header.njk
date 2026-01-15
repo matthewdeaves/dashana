@@ -29,7 +29,7 @@
       {% if versions.length > 0 %}
         <select id="version-select" class="version-select" aria-label="Select report version">
           <option value="{{ basePath }}/"{% if not version %} selected{% endif %}>
-            Latest ({{ buildDate }})
+            Latest ({{ versions[0] if versions.length else buildDate }})
           </option>
           {% for ver in versions %}
             <option value="{{ basePath }}/{{ ver }}/"{% if version == ver %} selected{% endif %}>

@@ -1077,6 +1077,27 @@ html.dark .error-hint {
   margin-bottom: 0;
 }
 
+/* Subtasks elsewhere indicator */
+.subtasks-elsewhere-indicator {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  padding: 0.375rem 0.5rem;
+  margin-left: 0.75rem;
+  border-left: 3px solid var(--color-border);
+  background: var(--color-bg-alt);
+  border-radius: 0 0 0.25rem 0.25rem;
+}
+
+/* When indicator is followed by subtasks container */
+.subtasks-elsewhere-indicator + .subtasks-container {
+  margin-top: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.subtasks-elsewhere-indicator:has(+ .subtasks-container) {
+  border-radius: 0;
+}
+
 /* Board card subtasks - compact style */
 .task-card.is-subtask {
   font-size: 0.85em;

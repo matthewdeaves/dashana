@@ -23,6 +23,11 @@
         {# This is a parent with subtasks - render as group #}
         <div class="task-group">
           {% include "components/task-card.njk" %}
+          {% if task.subtasksElsewhereCount > 0 %}
+          <div class="subtasks-elsewhere-indicator">
+            {{ task.totalSubtaskCount }} subtasks total ({{ task.subtasksElsewhereCount }} in other columns)
+          </div>
+          {% endif %}
           <div class="subtasks-container">
             {% for t in task.subtasksInSection %}
               <div class="task-card {% if t.isDone %}is-done{% endif %} {% if t.isOverdue %}is-overdue{% endif %} is-subtask">
@@ -49,8 +54,15 @@
           </div>
         </div>
       {% else %}
-        {# Regular task or subtask whose parent is elsewhere #}
-        {% include "components/task-card.njk" %}
+        {# Regular task, parent with all subtasks elsewhere, or subtask whose parent is elsewhere #}
+        <div class="{% if task.totalSubtaskCount > 0 and not task.isSubtask %}task-group{% endif %}">
+          {% include "components/task-card.njk" %}
+          {% if task.totalSubtaskCount > 0 and not task.isSubtask %}
+          <div class="subtasks-elsewhere-indicator">
+            {{ task.totalSubtaskCount }} subtask{% if task.totalSubtaskCount != 1 %}s{% endif %} in other columns
+          </div>
+          {% endif %}
+        </div>
       {% endif %}
     {% endfor %}
   </div>

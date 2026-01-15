@@ -270,6 +270,8 @@ function processRecords(records, today = null) {
   const taskNamesBySection = {};
   // Map: section -> parentName -> subtasks array
   const subtasksByParentInSection = {};
+  // Map: parentName -> all subtasks (regardless of section)
+  const allSubtasksByParent = {};
 
   sectionNames.forEach((name) => {
     taskNamesBySection[name] = new Set();
@@ -282,15 +284,19 @@ function processRecords(records, today = null) {
     if (taskNamesBySection[section]) {
       taskNamesBySection[section].add(task.name);
     }
-    if (
-      task.isSubtask &&
-      task.parentTask &&
-      subtasksByParentInSection[section]
-    ) {
-      if (!subtasksByParentInSection[section][task.parentTask]) {
-        subtasksByParentInSection[section][task.parentTask] = [];
+    if (task.isSubtask && task.parentTask) {
+      // Track subtasks by section for board grouping
+      if (subtasksByParentInSection[section]) {
+        if (!subtasksByParentInSection[section][task.parentTask]) {
+          subtasksByParentInSection[section][task.parentTask] = [];
+        }
+        subtasksByParentInSection[section][task.parentTask].push(task);
       }
-      subtasksByParentInSection[section][task.parentTask].push(task);
+      // Track all subtasks for total count
+      if (!allSubtasksByParent[task.parentTask]) {
+        allSubtasksByParent[task.parentTask] = [];
+      }
+      allSubtasksByParent[task.parentTask].push(task);
     }
   });
 
@@ -308,6 +314,11 @@ function processRecords(records, today = null) {
       task.subtasksInSection =
         subtasksByParentInSection[section]?.[task.name] || [];
       task.hasSubtasksInSection = task.subtasksInSection.length > 0;
+      // Track total subtask count for indicator display
+      const allSubtasks = allSubtasksByParent[task.name] || [];
+      task.totalSubtaskCount = allSubtasks.length;
+      task.subtasksElsewhereCount =
+        task.totalSubtaskCount - task.subtasksInSection.length;
     }
   });
 

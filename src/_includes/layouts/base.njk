@@ -77,6 +77,87 @@
       icon.addEventListener('mouseenter', updatePosition);
       icon.addEventListener('focus', updatePosition);
     });
+
+    // Mobile tooltip - real DOM element with fixed positioning (QA-005)
+    // Avoids iOS Safari focus issues and doesn't break table scroll
+    (function() {
+      var isTouch = 'ontouchstart' in window;
+      if (!isTouch) return;
+
+      // Disable CSS :focus tooltips on touch devices (JS handles it)
+      document.documentElement.classList.add('touch-device');
+
+      var triggers = '.notes-icon, .notes-text-preview, .card-notes-icon';
+      var activeTrigger = null;
+      var tooltip = null;
+
+      function getTooltip() {
+        if (!tooltip) {
+          tooltip = document.createElement('div');
+          tooltip.className = 'mobile-tooltip';
+          document.body.appendChild(tooltip);
+        }
+        return tooltip;
+      }
+
+      function showTooltip(trigger) {
+        // Remove focus to hide CSS :focus::after tooltip (prevents double tooltip)
+        trigger.blur();
+
+        var el = getTooltip();
+        var notes = trigger.getAttribute('data-notes');
+        var rect = trigger.getBoundingClientRect();
+
+        el.textContent = notes;
+        el.style.display = 'block';
+
+        // Measure tooltip dimensions
+        var tooltipRect = el.getBoundingClientRect();
+        var spaceAbove = rect.top;
+        var spaceBelow = window.innerHeight - rect.bottom;
+
+        // Position vertically - prefer below, flip if needed
+        if (spaceBelow >= tooltipRect.height + 10 || spaceBelow > spaceAbove) {
+          el.style.top = (rect.bottom + 8) + 'px';
+        } else {
+          el.style.top = (rect.top - tooltipRect.height - 8) + 'px';
+        }
+
+        // Center horizontally, constrain to viewport
+        var left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        left = Math.max(10, Math.min(left, window.innerWidth - tooltipRect.width - 10));
+        el.style.left = left + 'px';
+
+        activeTrigger = trigger;
+      }
+
+      function hideTooltip() {
+        if (tooltip) tooltip.style.display = 'none';
+        activeTrigger = null;
+      }
+
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest(triggers);
+
+        if (trigger) {
+          e.preventDefault(); // Prevent any default link behavior
+          if (activeTrigger === trigger) {
+            hideTooltip();
+          } else {
+            showTooltip(trigger);
+          }
+        } else {
+          hideTooltip();
+        }
+      });
+    })();
+
+    // Dismiss on Escape key (accessibility - WCAG 1.4.13)
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.activeElement.blur();
+      }
+    });
   </script>
 </body>
 </html>

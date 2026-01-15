@@ -51,4 +51,25 @@ Medium - Core functionality is broken on mobile devices.
 Fixed
 
 ## Resolution
-Replaced HTML `title` attribute with a CSS-based tooltip using `data-notes` attribute and `:focus`/`:hover` states. Added `tabindex="0"` to make icons focusable for touch/keyboard access. The tooltip now appears on hover (desktop) and tap-to-focus (mobile).
+
+### Initial Fix (CSS-based)
+Replaced HTML `title` attribute with CSS-based tooltips using `data-notes` attribute and `::after` pseudo-elements. Added `tabindex="0"` for keyboard/touch focus. Tooltips show on `:hover` (desktop) and `:focus` (mobile tap).
+
+### Final Fix (QA-005 - DOM-based for mobile)
+The CSS `:focus` approach caused iOS Safari issues (scroll jump, dismiss on scroll). The final solution uses a JavaScript DOM tooltip on touch devices:
+
+- Detects touch devices via `'ontouchstart' in window`
+- Adds `.touch-device` class to `<html>` to disable CSS `::after` tooltips
+- Creates a single `<div class="mobile-tooltip">` with `position: fixed` appended to `<body>`
+- Shows tooltip on tap, dismisses on tap outside or tap again (toggle)
+- Uses `position: fixed` to escape scroll containers without breaking table horizontal scroll
+
+**Behavior by device:**
+| Device | Method |
+|--------|--------|
+| Desktop | CSS `::after` on `:hover`/`:focus` |
+| Touch | JS DOM tooltip on click |
+
+**Files modified:**
+- `src/_includes/layouts/base.njk` - Mobile tooltip JS handler
+- `src/css/styles.css` - `.mobile-tooltip` class, `.touch-device` rules

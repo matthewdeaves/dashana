@@ -951,10 +951,11 @@ html.dark .error-hint {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--color-text);
-  color: var(--color-bg);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
+  border: 1px solid var(--color-border);
   font-size: 0.8rem;
   line-height: 1.4;
   white-space: pre-wrap;
@@ -968,7 +969,7 @@ html.dark .error-hint {
   transition:
     opacity 0.15s,
     visibility 0.15s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   text-align: left;
   margin-bottom: 8px;
 }
@@ -983,7 +984,7 @@ html.dark .error-hint {
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: var(--color-text);
+  border-top-color: var(--color-border);
   margin-bottom: -4px;
   z-index: 1001;
   opacity: 0;
@@ -1015,6 +1016,36 @@ html.dark .error-hint {
   visibility: visible;
 }
 
+/* Hide ALL CSS pseudo-element tooltips on touch devices - JS handles them (QA-005) */
+.touch-device .notes-icon::after,
+.touch-device .notes-icon::before,
+.touch-device .card-notes-icon::after,
+.touch-device .card-notes-icon::before,
+.touch-device .notes-text-preview::after,
+.touch-device .notes-text-preview::before {
+  display: none !important;
+}
+
+/* Mobile tooltip - real DOM element with fixed positioning (QA-005) */
+.mobile-tooltip {
+  position: fixed;
+  display: none;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  max-width: min(300px, calc(100vw - 20px));
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: left;
+}
+
 /* Remove default focus outline, add custom */
 .notes-icon:focus,
 .card-notes-icon:focus,
@@ -1038,7 +1069,7 @@ html.dark .error-hint {
   margin-bottom: 0;
   margin-top: -4px;
   border-top-color: transparent;
-  border-bottom-color: var(--color-text);
+  border-bottom-color: var(--color-border);
 }
 
 /* Flip table tooltip below when near top of viewport */
@@ -1057,7 +1088,7 @@ html.dark .error-hint {
   margin-bottom: 0;
   margin-top: -4px;
   border-top-color: transparent;
-  border-bottom-color: var(--color-text);
+  border-bottom-color: var(--color-border);
 }
 
 /* Subtasks */
@@ -1201,11 +1232,11 @@ html.dark .error-hint {
   overflow-x: auto;
 }
 
-/* Allow tooltip to escape container when active */
-.table-container:has(.notes-icon:hover),
-.table-container:has(.notes-icon:focus),
-.table-container:has(.notes-text-preview:hover),
-.table-container:has(.notes-text-preview:focus) {
+/* Allow tooltip to escape container when active (desktop only, not touch) */
+html:not(.touch-device) .table-container:has(.notes-icon:hover),
+html:not(.touch-device) .table-container:has(.notes-icon:focus),
+html:not(.touch-device) .table-container:has(.notes-text-preview:hover),
+html:not(.touch-device) .table-container:has(.notes-text-preview:focus) {
   overflow: visible;
 }
 

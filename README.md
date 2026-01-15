@@ -74,6 +74,24 @@ CUSTOMER_NAME=Acme Corp      # Shown in header
 SITE_BASE=                   # Optional: for custom domain paths (auto-detected on GitHub Pages)
 ```
 
+### View Names and Page Headings
+
+Customise navigation labels and page titles:
+
+```ini
+# Navigation buttons and browser tab titles
+DASHBOARD_NAME=Dashboard
+BOARD_NAME=Board
+TASKS_NAME=Tasks
+TIMELINE_NAME=Timeline
+
+# Main h2 heading on each page
+DASHBOARD_HEADING=Project Overview
+BOARD_HEADING=Kanban Board
+TASKS_HEADING=Task List
+TIMELINE_HEADING=Timeline
+```
+
 ### Tab Visibility
 
 Hide views you don't need:

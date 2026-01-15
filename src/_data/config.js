@@ -29,6 +29,18 @@ const CONFIG_SCHEMA = {
   CUSTOMER_NAME: { path: "customerName", type: "string" },
   SITE_BASE: { path: "siteBase", type: "string" },
 
+  // View names (navigation buttons and browser tab titles)
+  DASHBOARD_NAME: { path: "viewNames.dashboard", type: "string" },
+  BOARD_NAME: { path: "viewNames.board", type: "string" },
+  TASKS_NAME: { path: "viewNames.tasks", type: "string" },
+  TIMELINE_NAME: { path: "viewNames.timeline", type: "string" },
+
+  // Page headings (main h2 on each page)
+  DASHBOARD_HEADING: { path: "pageHeadings.dashboard", type: "string" },
+  BOARD_HEADING: { path: "pageHeadings.board", type: "string" },
+  TASKS_HEADING: { path: "pageHeadings.tasks", type: "string" },
+  TIMELINE_HEADING: { path: "pageHeadings.timeline", type: "string" },
+
   // Tab visibility (boolean values)
   SHOW_DASHBOARD: { path: "tabs.dashboard", type: "boolean" },
   SHOW_BOARD: { path: "tabs.board", type: "boolean" },
@@ -110,6 +122,22 @@ module.exports = function () {
     projectName: "Project Report",
     customerName: "Customer",
     siteBase: "",
+
+    // View names (navigation buttons and browser tab titles)
+    viewNames: {
+      dashboard: "Dashboard",
+      board: "Board",
+      tasks: "Tasks",
+      timeline: "Timeline",
+    },
+
+    // Page headings (main h2 on each page)
+    pageHeadings: {
+      dashboard: "Project Overview",
+      board: "Kanban Board",
+      tasks: "Task List",
+      timeline: "Timeline",
+    },
 
     // Tab visibility (all shown by default)
     tabs: {

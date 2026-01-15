@@ -1,7 +1,8 @@
 ---
 layout: layouts/base.njk
-title: Timeline
 permalink: /timeline/
+eleventyComputed:
+  title: "{{ config.viewNames.timeline }}"
 ---
 
 {% if not config.tabs.timeline %}
@@ -13,7 +14,7 @@ permalink: /timeline/
 <div class="timeline-page">
   <div class="page-header">
     <div class="page-header-top">
-      <h2>Timeline</h2>
+      <h2>{{ config.pageHeadings.timeline }}</h2>
       <p class="page-subtitle">
         {{ tasks.timeline.length }} tasks sorted by date
         {% if tasks.projectRange.start %}

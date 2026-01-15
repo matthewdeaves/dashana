@@ -1,7 +1,8 @@
 ---
 layout: layouts/base.njk
-title: Dashboard
 permalink: /
+eleventyComputed:
+  title: "{{ config.viewNames.dashboard }}"
 ---
 
 {% if not config.tabs.dashboard %}
@@ -19,7 +20,7 @@ permalink: /
 
 <div class="dashboard">
   <div class="dashboard-header">
-    <h2>Project Overview</h2>
+    <h2>{{ config.pageHeadings.dashboard }}</h2>
     <p class="dashboard-subtitle">{{ tasks.stats.total }} total tasks</p>
   </div>
 

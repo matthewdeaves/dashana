@@ -149,6 +149,18 @@ describe("Config Module", () => {
     expect(config.tabs.tasks).toBe(true);
     expect(config.tabs.timeline).toBe(true);
 
+    // View names default to standard labels
+    expect(config.viewNames.dashboard).toBe("Dashboard");
+    expect(config.viewNames.board).toBe("Board");
+    expect(config.viewNames.tasks).toBe("Tasks");
+    expect(config.viewNames.timeline).toBe("Timeline");
+
+    // Page headings default to descriptive titles
+    expect(config.pageHeadings.dashboard).toBe("Project Overview");
+    expect(config.pageHeadings.board).toBe("Kanban Board");
+    expect(config.pageHeadings.tasks).toBe("Task List");
+    expect(config.pageHeadings.timeline).toBe("Timeline");
+
     // All column options default to true
     expect(config.tasksColumns.name).toBe(true);
     expect(config.tasksColumns.notes).toBe(true);
@@ -183,6 +195,50 @@ SHOW_TIMELINE=NO
     expect(config.tabs.board).toBe(false);
     expect(config.tabs.tasks).toBe(true); // Default
     expect(config.tabs.timeline).toBe(false);
+  });
+
+  test("parses view names settings", () => {
+    fs.writeFileSync(
+      tempConfigPath,
+      `PROJECT_NAME=Test
+DASHBOARD_NAME=Home
+BOARD_NAME=Sprint Board
+TASKS_NAME=Backlog
+TIMELINE_NAME=Roadmap
+`,
+    );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
+
+    delete require.cache[require.resolve("../src/_data/config.js")];
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
+
+    expect(config.viewNames.dashboard).toBe("Home");
+    expect(config.viewNames.board).toBe("Sprint Board");
+    expect(config.viewNames.tasks).toBe("Backlog");
+    expect(config.viewNames.timeline).toBe("Roadmap");
+  });
+
+  test("parses page headings settings", () => {
+    fs.writeFileSync(
+      tempConfigPath,
+      `PROJECT_NAME=Test
+DASHBOARD_HEADING=Welcome
+BOARD_HEADING=Current Sprint
+TASKS_HEADING=Product Backlog
+TIMELINE_HEADING=Release Plan
+`,
+    );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
+
+    delete require.cache[require.resolve("../src/_data/config.js")];
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
+
+    expect(config.pageHeadings.dashboard).toBe("Welcome");
+    expect(config.pageHeadings.board).toBe("Current Sprint");
+    expect(config.pageHeadings.tasks).toBe("Product Backlog");
+    expect(config.pageHeadings.timeline).toBe("Release Plan");
   });
 
   test("parses tasks column settings", () => {
@@ -394,6 +450,44 @@ describe("CONFIG_SCHEMA", () => {
     expect(CONFIG_SCHEMA.PROJECT_NAME.type).toBe("string");
     expect(CONFIG_SCHEMA.CUSTOMER_NAME.type).toBe("string");
     expect(CONFIG_SCHEMA.SITE_BASE.type).toBe("string");
+  });
+
+  test("has view name options", () => {
+    expect(CONFIG_SCHEMA.DASHBOARD_NAME).toEqual({
+      path: "viewNames.dashboard",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.BOARD_NAME).toEqual({
+      path: "viewNames.board",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.TASKS_NAME).toEqual({
+      path: "viewNames.tasks",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.TIMELINE_NAME).toEqual({
+      path: "viewNames.timeline",
+      type: "string",
+    });
+  });
+
+  test("has page heading options", () => {
+    expect(CONFIG_SCHEMA.DASHBOARD_HEADING).toEqual({
+      path: "pageHeadings.dashboard",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.BOARD_HEADING).toEqual({
+      path: "pageHeadings.board",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.TASKS_HEADING).toEqual({
+      path: "pageHeadings.tasks",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.TIMELINE_HEADING).toEqual({
+      path: "pageHeadings.timeline",
+      type: "string",
+    });
   });
 
   test("has all tasks column options", () => {

@@ -1,7 +1,8 @@
 ---
 layout: layouts/base.njk
-title: Tasks
 permalink: /tasks/
+eleventyComputed:
+  title: "{{ config.viewNames.tasks }}"
 ---
 
 {% if not config.tabs.tasks %}
@@ -13,7 +14,7 @@ permalink: /tasks/
 <div class="tasks-page">
   <div class="page-header">
     <div class="page-header-top">
-      <h2>Task List</h2>
+      <h2>{{ config.pageHeadings.tasks }}</h2>
       <p class="page-subtitle">{{ tasks.stats.total }} tasks sorted by section and priority</p>
     </div>
     {% include "components/filter-toggle.njk" %}

@@ -38,6 +38,7 @@ permalink: /timeline/
           {% if config.timelineColumns.status %}<th scope="col" class="col-status">Status</th>{% endif %}
           {% if config.timelineColumns.parent %}<th scope="col" class="col-parent">Parent</th>{% endif %}
           {% if config.timelineColumns.notes %}<th scope="col" class="col-notes">Notes</th>{% endif %}
+          {% if config.timelineColumns.notesText %}<th scope="col" class="col-notes-text">Notes</th>{% endif %}
           {% if config.timelineColumns.custom %}
             {% for fieldName in tasks.customFieldNames %}
             <th scope="col" class="col-custom">{{ fieldName }}</th>
@@ -120,6 +121,23 @@ permalink: /timeline/
           <td class="col-notes">
             {% if task.notes %}
               <span class="notes-icon" data-notes="{{ task.notes }}" tabindex="0" role="button" aria-label="View notes">📝</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          {% endif %}
+          {% if config.timelineColumns.notesText %}
+          <td class="col-notes-text">
+            {% if task.notes %}
+              {% if config.timelineColumns.notesTextMode == 'full' %}
+                <span class="notes-text-full">{{ task.notes }}</span>
+              {% else %}
+                <span class="notes-text-preview"
+                      data-notes="{{ task.notes }}"
+                      tabindex="0"
+                      role="button"
+                      aria-label="View full notes">{{ task.notes | truncate(config.notesTextPreviewLength) }}</span>
+              {% endif %}
             {% else %}
               —
             {% endif %}

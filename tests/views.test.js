@@ -739,3 +739,207 @@ describe("Subtask Ordering and Grouping", () => {
     });
   });
 });
+
+/*
+ * Notes Text Column Tests
+ * Tests for the inline notes text column feature (ENH-001)
+ */
+const NOTES_TEXT_PREVIEW_CONFIG = path.join(
+  __dirname,
+  "fixtures/notes-text-preview.config",
+);
+const NOTES_TEXT_FULL_CONFIG = path.join(
+  __dirname,
+  "fixtures/notes-text-full.config",
+);
+
+describe("Notes Text Column - Default (Enabled)", () => {
+  // Uses the main fixture which has notesText enabled by default
+
+  test("notes text column is visible when enabled", () => {
+    const $ = loadPage("tasks/index.html");
+    const notesTextCols = $(".col-notes-text").length;
+    expect(notesTextCols).toBeGreaterThan(0);
+  });
+
+  test("notes text column header is visible when enabled", () => {
+    const $ = loadPage("tasks/index.html");
+    const headers = [];
+    $(".task-table th").each((_i, el) => {
+      headers.push($(el).attr("class") || "");
+    });
+    expect(headers.filter((h) => h.includes("col-notes-text")).length).toBe(1);
+  });
+});
+
+describe("Notes Text Column - Preview Mode", () => {
+  beforeAll(() => {
+    execSync("npm run build", {
+      cwd: path.join(__dirname, ".."),
+      stdio: "pipe",
+      env: {
+        ...process.env,
+        DASHANA_CSV_PATH: FIXTURE_CSV,
+        DASHANA_CONFIG_PATH: NOTES_TEXT_PREVIEW_CONFIG,
+      },
+    });
+  });
+
+  describe("Tasks View", () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage("tasks/index.html");
+    });
+
+    test("has Notes column header for notes text", () => {
+      const headers = [];
+      $(".task-table th").each((_i, el) => {
+        if ($(el).hasClass("col-notes-text")) {
+          headers.push($(el).text().trim());
+        }
+      });
+      expect(headers).toContain("Notes");
+    });
+
+    test("displays notes text preview for tasks with notes", () => {
+      const previews = $(".task-table .notes-text-preview");
+      expect(previews.length).toBeGreaterThan(0);
+    });
+
+    test("preview text is truncated with ellipsis", () => {
+      // Task One has notes "First task with important details" (35 chars)
+      // With NOTES_TEXT_PREVIEW_LENGTH=50, it should show full text
+      // Task Four has notes "Blocked by dependency" which is short
+      const previewTexts = [];
+      $(".task-table .notes-text-preview").each((_i, el) => {
+        previewTexts.push($(el).text().trim());
+      });
+      expect(previewTexts.length).toBeGreaterThan(0);
+      // All preview texts should exist
+      previewTexts.forEach((text) => {
+        expect(text.length).toBeGreaterThan(0);
+      });
+    });
+
+    test("preview has data-notes attribute with full text", () => {
+      const firstPreview = $(".task-table .notes-text-preview").first();
+      const dataNotes = firstPreview.attr("data-notes");
+      expect(dataNotes).toBeDefined();
+      expect(dataNotes.length).toBeGreaterThan(0);
+    });
+
+    test("preview has accessibility attributes", () => {
+      const firstPreview = $(".task-table .notes-text-preview").first();
+      expect(firstPreview.attr("tabindex")).toBe("0");
+      expect(firstPreview.attr("role")).toBe("button");
+      expect(firstPreview.attr("aria-label")).toBe("View full notes");
+    });
+
+    test("shows em-dash for tasks without notes", () => {
+      const html = $(".task-table .col-notes-text").text();
+      expect(html).toContain("—");
+    });
+  });
+
+  describe("Timeline View", () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage("timeline/index.html");
+    });
+
+    test("has Notes column header for notes text", () => {
+      const headers = [];
+      $(".timeline-table th").each((_i, el) => {
+        if ($(el).hasClass("col-notes-text")) {
+          headers.push($(el).text().trim());
+        }
+      });
+      expect(headers).toContain("Notes");
+    });
+
+    test("displays notes text preview for tasks with notes", () => {
+      const previews = $(".timeline-table .notes-text-preview");
+      expect(previews.length).toBeGreaterThan(0);
+    });
+
+    test("shows em-dash for tasks without notes", () => {
+      const html = $(".timeline-table .col-notes-text").text();
+      expect(html).toContain("—");
+    });
+  });
+});
+
+describe("Notes Text Column - Full Mode", () => {
+  beforeAll(() => {
+    execSync("npm run build", {
+      cwd: path.join(__dirname, ".."),
+      stdio: "pipe",
+      env: {
+        ...process.env,
+        DASHANA_CSV_PATH: FIXTURE_CSV,
+        DASHANA_CONFIG_PATH: NOTES_TEXT_FULL_CONFIG,
+      },
+    });
+  });
+
+  describe("Tasks View", () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage("tasks/index.html");
+    });
+
+    test("has Notes column header for notes text", () => {
+      const headers = [];
+      $(".task-table th").each((_i, el) => {
+        if ($(el).hasClass("col-notes-text")) {
+          headers.push($(el).text().trim());
+        }
+      });
+      expect(headers).toContain("Notes");
+    });
+
+    test("displays full notes text for tasks with notes", () => {
+      const fullTexts = $(".task-table .notes-text-full");
+      expect(fullTexts.length).toBeGreaterThan(0);
+    });
+
+    test("full mode shows complete text without truncation", () => {
+      const html = $(".task-table").html();
+      // Task One's notes should be fully visible
+      expect(html).toContain("First task with important details");
+      // Task Two's notes
+      expect(html).toContain("Backend API implementation");
+    });
+
+    test("full mode does not have preview class", () => {
+      const previews = $(".task-table .notes-text-preview");
+      expect(previews.length).toBe(0);
+    });
+
+    test("shows em-dash for tasks without notes", () => {
+      const html = $(".task-table .col-notes-text").text();
+      expect(html).toContain("—");
+    });
+  });
+
+  describe("Timeline View", () => {
+    let $;
+
+    beforeAll(() => {
+      $ = loadPage("timeline/index.html");
+    });
+
+    test("displays full notes text for tasks with notes", () => {
+      const fullTexts = $(".timeline-table .notes-text-full");
+      expect(fullTexts.length).toBeGreaterThan(0);
+    });
+
+    test("full mode shows complete text", () => {
+      const html = $(".timeline-table").html();
+      expect(html).toContain("First task with important details");
+    });
+  });
+});

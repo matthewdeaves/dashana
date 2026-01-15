@@ -4,6 +4,7 @@ const path = require("path");
 // Import the functions for unit testing
 const {
   parseYesNo,
+  parseNumber,
   CONFIG_SCHEMA,
   setNestedValue,
 } = require("../src/_data/config.js");
@@ -76,6 +77,39 @@ describe("parseYesNo", () => {
   });
 });
 
+describe("parseNumber", () => {
+  test("parses valid integer", () => {
+    expect(parseNumber("100")).toBe(100);
+  });
+
+  test("parses zero", () => {
+    expect(parseNumber("0")).toBe(0);
+  });
+
+  test("parses negative numbers", () => {
+    expect(parseNumber("-50")).toBe(-50);
+  });
+
+  test("trims whitespace before parsing", () => {
+    expect(parseNumber("  200  ")).toBe(200);
+  });
+
+  test("returns 0 for invalid input by default", () => {
+    expect(parseNumber("abc")).toBe(0);
+    expect(parseNumber("")).toBe(0);
+  });
+
+  test("returns custom default for invalid input", () => {
+    expect(parseNumber("abc", 100)).toBe(100);
+    expect(parseNumber("", 50)).toBe(50);
+  });
+
+  test("truncates decimal values to integer", () => {
+    expect(parseNumber("100.5")).toBe(100);
+    expect(parseNumber("99.9")).toBe(99);
+  });
+});
+
 describe("Config Module", () => {
   // Use temp file for tests (never touch production config)
   const tempConfigPath = path.join(__dirname, "fixtures/temp-test.config");
@@ -92,6 +126,9 @@ describe("Config Module", () => {
   });
 
   test("returns default values when config file is missing", () => {
+    // Silence expected "config not found" warning
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+
     // Point to non-existent file
     process.env.DASHANA_CONFIG_PATH = path.join(
       __dirname,
@@ -117,6 +154,15 @@ describe("Config Module", () => {
     expect(config.tasksColumns.notes).toBe(true);
     expect(config.timelineColumns.duration).toBe(true);
     expect(config.cardItems.tags).toBe(true);
+
+    // Notes text columns default to true (shown by default)
+    expect(config.tasksColumns.notesText).toBe(true);
+    expect(config.tasksColumns.notesTextMode).toBe("preview");
+    expect(config.timelineColumns.notesText).toBe(true);
+    expect(config.timelineColumns.notesTextMode).toBe("preview");
+    expect(config.notesTextPreviewLength).toBe(100);
+
+    warnSpy.mockRestore();
   });
 
   test("parses tab visibility settings", () => {
@@ -199,6 +245,47 @@ CARD_SHOW_CUSTOM=NO
     expect(config.cardItems.tags).toBe(false);
     expect(config.cardItems.notes).toBe(false);
     expect(config.cardItems.custom).toBe(false);
+  });
+
+  test("parses notes text column settings", () => {
+    fs.writeFileSync(
+      tempConfigPath,
+      `PROJECT_NAME=Test
+TASKS_COL_NOTES_TEXT=YES
+TASKS_NOTES_TEXT_MODE=full
+TIMELINE_COL_NOTES_TEXT=YES
+TIMELINE_NOTES_TEXT_MODE=preview
+NOTES_TEXT_PREVIEW_LENGTH=150
+`,
+    );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
+
+    delete require.cache[require.resolve("../src/_data/config.js")];
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
+
+    expect(config.tasksColumns.notesText).toBe(true);
+    expect(config.tasksColumns.notesTextMode).toBe("full");
+    expect(config.timelineColumns.notesText).toBe(true);
+    expect(config.timelineColumns.notesTextMode).toBe("preview");
+    expect(config.notesTextPreviewLength).toBe(150);
+  });
+
+  test("parses notes text preview length as number", () => {
+    fs.writeFileSync(
+      tempConfigPath,
+      `PROJECT_NAME=Test
+NOTES_TEXT_PREVIEW_LENGTH=200
+`,
+    );
+    process.env.DASHANA_CONFIG_PATH = tempConfigPath;
+
+    delete require.cache[require.resolve("../src/_data/config.js")];
+    const configFn = require("../src/_data/config.js");
+    const config = configFn();
+
+    expect(config.notesTextPreviewLength).toBe(200);
+    expect(typeof config.notesTextPreviewLength).toBe("number");
   });
 
   test("ignores comment lines starting with #", () => {
@@ -313,14 +400,37 @@ describe("CONFIG_SCHEMA", () => {
     const tasksColKeys = Object.keys(CONFIG_SCHEMA).filter((k) =>
       k.startsWith("TASKS_COL_"),
     );
-    expect(tasksColKeys.length).toBe(11); // name, progress, section, assignee, due, priority, status, tags, parent, notes, custom
+    expect(tasksColKeys.length).toBe(12); // name, progress, section, assignee, due, priority, status, tags, parent, notes, notesText, custom
   });
 
   test("has all timeline column options", () => {
     const timelineColKeys = Object.keys(CONFIG_SCHEMA).filter((k) =>
       k.startsWith("TIMELINE_COL_"),
     );
-    expect(timelineColKeys.length).toBe(11);
+    expect(timelineColKeys.length).toBe(12); // +notesText
+  });
+
+  test("has notes text schema entries", () => {
+    expect(CONFIG_SCHEMA.TASKS_COL_NOTES_TEXT).toEqual({
+      path: "tasksColumns.notesText",
+      type: "boolean",
+    });
+    expect(CONFIG_SCHEMA.TASKS_NOTES_TEXT_MODE).toEqual({
+      path: "tasksColumns.notesTextMode",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.TIMELINE_COL_NOTES_TEXT).toEqual({
+      path: "timelineColumns.notesText",
+      type: "boolean",
+    });
+    expect(CONFIG_SCHEMA.TIMELINE_NOTES_TEXT_MODE).toEqual({
+      path: "timelineColumns.notesTextMode",
+      type: "string",
+    });
+    expect(CONFIG_SCHEMA.NOTES_TEXT_PREVIEW_LENGTH).toEqual({
+      path: "notesTextPreviewLength",
+      type: "number",
+    });
   });
 
   test("has all card item options", () => {

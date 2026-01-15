@@ -11,6 +11,15 @@ function parseYesNo(value) {
 }
 
 /**
+ * Parse a numeric value from config.
+ * Returns parsed integer, or defaultValue if parsing fails.
+ */
+function parseNumber(value, defaultValue = 0) {
+  const parsed = parseInt(value.trim(), 10);
+  return Number.isNaN(parsed) ? defaultValue : parsed;
+}
+
+/**
  * Configuration schema - maps config keys to nested paths and types.
  * Adding new config options only requires adding a line here.
  */
@@ -37,7 +46,9 @@ const CONFIG_SCHEMA = {
   TASKS_COL_TAGS: { path: "tasksColumns.tags", type: "boolean" },
   TASKS_COL_PARENT: { path: "tasksColumns.parent", type: "boolean" },
   TASKS_COL_NOTES: { path: "tasksColumns.notes", type: "boolean" },
+  TASKS_COL_NOTES_TEXT: { path: "tasksColumns.notesText", type: "boolean" },
   TASKS_COL_CUSTOM: { path: "tasksColumns.custom", type: "boolean" },
+  TASKS_NOTES_TEXT_MODE: { path: "tasksColumns.notesTextMode", type: "string" },
 
   // Timeline columns
   TIMELINE_COL_NAME: { path: "timelineColumns.name", type: "boolean" },
@@ -50,7 +61,18 @@ const CONFIG_SCHEMA = {
   TIMELINE_COL_TAGS: { path: "timelineColumns.tags", type: "boolean" },
   TIMELINE_COL_PARENT: { path: "timelineColumns.parent", type: "boolean" },
   TIMELINE_COL_NOTES: { path: "timelineColumns.notes", type: "boolean" },
+  TIMELINE_COL_NOTES_TEXT: {
+    path: "timelineColumns.notesText",
+    type: "boolean",
+  },
   TIMELINE_COL_CUSTOM: { path: "timelineColumns.custom", type: "boolean" },
+  TIMELINE_NOTES_TEXT_MODE: {
+    path: "timelineColumns.notesTextMode",
+    type: "string",
+  },
+
+  // Global settings
+  NOTES_TEXT_PREVIEW_LENGTH: { path: "notesTextPreviewLength", type: "number" },
 
   // Card items
   CARD_SHOW_PROGRESS: { path: "cardItems.progress", type: "boolean" },
@@ -109,6 +131,8 @@ module.exports = function () {
       tags: true,
       parent: true,
       notes: true,
+      notesText: true,
+      notesTextMode: "preview",
       custom: true,
     },
 
@@ -124,8 +148,13 @@ module.exports = function () {
       tags: true,
       parent: true,
       notes: true,
+      notesText: true,
+      notesTextMode: "preview",
       custom: true,
     },
+
+    // Global settings
+    notesTextPreviewLength: 100,
 
     // Board card items (all shown by default)
     cardItems: {
@@ -157,8 +186,14 @@ module.exports = function () {
       // Look up key in schema
       const schema = CONFIG_SCHEMA[key];
       if (schema) {
-        const parsedValue =
-          schema.type === "boolean" ? parseYesNo(value) : value;
+        let parsedValue;
+        if (schema.type === "boolean") {
+          parsedValue = parseYesNo(value);
+        } else if (schema.type === "number") {
+          parsedValue = parseNumber(value);
+        } else {
+          parsedValue = value;
+        }
         setNestedValue(config, schema.path, parsedValue);
       }
     });
@@ -171,5 +206,6 @@ module.exports = function () {
 
 // Export for testing
 module.exports.parseYesNo = parseYesNo;
+module.exports.parseNumber = parseNumber;
 module.exports.CONFIG_SCHEMA = CONFIG_SCHEMA;
 module.exports.setNestedValue = setNestedValue;

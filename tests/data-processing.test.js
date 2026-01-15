@@ -311,6 +311,9 @@ describe("Custom Fields", () => {
   });
 
   test("returns empty customFieldNames for CSV without custom fields", () => {
+    // Silence expected warnings for minimal test data
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+
     const recordsWithoutCustomFields = [
       { "Task ID": "1", Name: "Test", "Section/Column": "To do" },
     ];
@@ -319,9 +322,14 @@ describe("Custom Fields", () => {
       new Date("2026-01-15"),
     );
     expect(result.customFieldNames).toEqual([]);
+
+    warnSpy.mockRestore();
   });
 
   test("tasks have null customFields when no custom columns exist", () => {
+    // Silence expected warnings for minimal test data
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+
     const recordsWithoutCustomFields = [
       { "Task ID": "1", Name: "Test", "Section/Column": "To do" },
     ];
@@ -330,6 +338,8 @@ describe("Custom Fields", () => {
       new Date("2026-01-15"),
     );
     expect(result.all[0].customFields).toBeNull();
+
+    warnSpy.mockRestore();
   });
 });
 
@@ -406,6 +416,9 @@ describe("Tags, Parent Task, and Notes", () => {
   });
 
   test("subtasks without parent still go to Uncategorized", () => {
+    // Silence expected warnings for minimal test data
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+
     // Test that tasks without section AND without parent go to Uncategorized
     const records = [
       {
@@ -417,6 +430,8 @@ describe("Tags, Parent Task, and Notes", () => {
     ];
     const result = processRecords(records, new Date("2026-01-15"));
     expect(result.all[0].section).toBe("Uncategorized");
+
+    warnSpy.mockRestore();
   });
 
   test("subtasks appear directly after their parent task in all array", () => {
@@ -442,6 +457,9 @@ describe("Tags, Parent Task, and Notes", () => {
   });
 
   test("parent task with subtasks maintains relative ordering", () => {
+    // Silence expected warnings for minimal test data
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+
     // Create a scenario with multiple parents and subtasks
     const records = [
       {
@@ -489,6 +507,8 @@ describe("Tags, Parent Task, and Notes", () => {
       "Parent B",
       "Sub B1",
     ]);
+
+    warnSpy.mockRestore();
   });
 });
 

@@ -140,4 +140,23 @@
     width: 48%;
     margin: 0.5% 0.5% 1% 0.5%;
   }
+
+  /* Notes text column - show full content in print (tooltips don't work) */
+  .notes-text-preview {
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* Hide tooltip pseudo-elements in print */
+  .notes-text-preview::after,
+  .notes-text-preview::before {
+    display: none !important;
+  }
+
+  .col-notes-text {
+    max-width: none !important;
+  }
 }
